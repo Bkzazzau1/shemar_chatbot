@@ -256,7 +256,7 @@ function detectIntent(message, faqs) {
   return best || { intent: "unknown", answer: "I could not match that enquiry. Please rephrase it or request human support." };
 }
 
-function Header({ cartCount }) {
+function Header({ cartCount, page }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -287,13 +287,13 @@ function Header({ cartCount }) {
           <a href="#support" className="hover:text-[#D4AF37]">
             Support
           </a>
-          <a href="#admin" className="hover:text-[#D4AF37]">
+          <a href="#admin" className={page === "admin" ? "text-[#D4AF37]" : "hover:text-[#D4AF37]"}>
             Admin Demo
           </a>
         </nav>
 
         <Button
-          onClick={() => document.querySelector("#products")?.scrollIntoView()}
+          onClick={() => { if (page === "admin") window.location.hash = "#products"; else document.querySelector("#products")?.scrollIntoView(); }}
           className="hidden items-center gap-2 rounded-2xl bg-[#D4AF37] px-5 text-black hover:bg-[#f0cc5a] md:inline-flex"
         >
           <ShoppingCart size={17} /> Shop Premium
@@ -807,8 +807,9 @@ function AdminPreview({ demo, saveFaq, deleteFaq, setStatus, resetDemo }) {
     Feedback: demo.feedback,
     Escalations: demo.escalations,
   };
-  return <section id="admin" className="bg-[#070707] py-16 text-white">
+  return <section id="admin" className="min-h-[calc(100vh-81px)] bg-[#070707] py-16 text-white">
     <div className="mx-auto max-w-7xl px-4">
+      <a href="#home" className="mb-6 inline-flex items-center gap-2 text-sm text-neutral-400 hover:text-[#D4AF37]">← Back to store</a>
       <p className="font-semibold uppercase tracking-wider text-[#D4AF37]">Browser-local demonstration</p>
       <h2 className="mt-3 text-3xl font-black">Interactive chatbot administration</h2>
       <p className="mt-3 max-w-4xl text-sm leading-7 text-neutral-400">
@@ -917,7 +918,19 @@ export default function ShemarCollectionChatbotDemo() {
   const [chatOpen, setChatOpen] = useState(true);
   const [cartNotice, setCartNotice] = useState("");
   const [demo, setDemo] = useState(() => loadDemoState(knowledgeBase));
+  const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
   useEffect(() => { saveDemoState(demo); }, [demo]);
+  useEffect(() => {
+    const onHashChange = () => setPage(window.location.hash === "#admin" ? "admin" : "store");
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
+  useEffect(() => {
+    // The target section only exists after the page switch renders, so scroll once it has.
+    const target = page === "store" && window.location.hash ? document.querySelector(window.location.hash) : null;
+    if (target) target.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }, [page]);
   const addRecord = (key, row) => setDemo((state) => ({ ...state, [key]: [row, ...state[key]] }));
   const saveFaq = (row) => setDemo((state) => ({ ...state, faqs: state.faqs.some((v) => v.id === row.id) ? state.faqs.map((v) => v.id === row.id ? row : v) : [...state.faqs, row] }));
 
@@ -929,15 +942,20 @@ export default function ShemarCollectionChatbotDemo() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Header cartCount={cartCount} />
-      <Hero onTryChatbot={() => setChatOpen(true)} onAddToCart={addToCart} />
-      <ServiceHighlights />
-      <Products onAddToCart={addToCart} />
-      <HowItWorks />
-      <AdminPreview demo={demo} saveFaq={saveFaq}
-        deleteFaq={(id) => setDemo((state) => ({ ...state, faqs: state.faqs.filter((v) => v.id !== id) }))}
-        setStatus={(id, status) => setDemo((state) => ({ ...state, escalations: state.escalations.map((v) => v.id === id ? { ...v, status } : v) }))}
-        resetDemo={() => setDemo(initialDemoState(knowledgeBase))} />
+      <Header cartCount={cartCount} page={page} />
+      {page === "admin" ? (
+        <AdminPreview demo={demo} saveFaq={saveFaq}
+          deleteFaq={(id) => setDemo((state) => ({ ...state, faqs: state.faqs.filter((v) => v.id !== id) }))}
+          setStatus={(id, status) => setDemo((state) => ({ ...state, escalations: state.escalations.map((v) => v.id === id ? { ...v, status } : v) }))}
+          resetDemo={() => setDemo(initialDemoState(knowledgeBase))} />
+      ) : (
+        <>
+          <Hero onTryChatbot={() => setChatOpen(true)} onAddToCart={addToCart} />
+          <ServiceHighlights />
+          <Products onAddToCart={addToCart} />
+          <HowItWorks />
+        </>
+      )}
 
       <footer className="border-t border-[#D4AF37]/20 bg-black px-4 py-10 text-center text-sm text-neutral-500">
         <p>
