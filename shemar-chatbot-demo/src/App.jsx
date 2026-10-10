@@ -337,16 +337,16 @@ function Hero({ onTryChatbot, onAddToCart }) {
         >
           <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-[#D4AF37]/10 px-4 py-2 text-sm text-[#D4AF37]">
             <Sparkles size={16} />
-            AI Customer Service Chatbot Demo
+            Customer Service Chatbot Demonstration
           </p>
 
           <h2 className="max-w-2xl text-4xl font-black leading-tight tracking-tight md:text-6xl">
-            Premium women’s fashion with instant AI support.
+            Premium women’s fashion with an interactive support demonstration.
           </h2>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-neutral-300">
             Shemar Collection is a luxury women’s fashion e-commerce demo used
-            to showcase an AI-based customer service chatbot. Customers can ask
+            to showcase a browser-based customer service chatbot. Customers can ask
             about dresses, scarves, bags, abayas, delivery, payment, returns and
             order support while shopping online.
           </p>
@@ -638,7 +638,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
               </div>
 
               <div>
-                <h3 className="font-bold">AI Support Assistant</h3>
+                <h3 className="font-bold">Customer Support Demo</h3>
                 <p className="text-xs text-[#D4AF37]">
                   Keyword-based intent matching
                 </p>
@@ -890,7 +890,7 @@ function HowItWorks() {
           <p className="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">System Process</p>
           <h2 className="mt-2 text-3xl font-black md:text-4xl">How the chatbot works</h2>
           <p className="mt-4 leading-7 text-neutral-400">
-            The demonstration follows a simple NLP customer-support pipeline from question to response.
+            The demonstration follows a transparent, keyword-based customer support workflow from question to response.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-5">
