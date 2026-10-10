@@ -129,6 +129,24 @@ const knowledgeBase = [
       "Hello! Welcome to Shemar Collection. I can help you with products, delivery, payment, returns, order tracking and customer support.",
   },
   {
+    intent: "delivery_fee",
+    keywords: ["delivery fee", "delivery fees", "delivery cost", "delivery charge", "shipping fee", "shipping cost", "how much is delivery", "how much", "fee"],
+    answer:
+      "Delivery fees depend on your location and package size. Deliveries within Kaduna cost less than interstate deliveries, and the exact fee is confirmed before you make payment.",
+  },
+  {
+    intent: "delivery_time",
+    keywords: ["how long", "how many days", "when will", "delivery time", "arrive", "fast delivery", "express"],
+    answer:
+      "Orders within Kaduna are usually delivered in 1 to 2 working days. Other states in Nigeria usually take 2 to 5 working days after payment is confirmed.",
+  },
+  {
+    intent: "international_shipping",
+    keywords: ["international", "outside nigeria", "abroad", "overseas", "uk", "usa", "ghana"],
+    answer:
+      "Shemar Collection currently delivers within Nigeria. For delivery outside Nigeria, please contact customer support so we can confirm options and costs for your country.",
+  },
+  {
     intent: "delivery",
     keywords: [
       "delivery",
@@ -147,7 +165,7 @@ const knowledgeBase = [
   },
   {
     intent: "payment",
-    keywords: ["payment", "pay", "card", "transfer", "bank", "cash", "pos"],
+    keywords: ["payment", "pay", "card", "transfer", "bank", "cash", "pos", "pay on delivery", "payment on delivery"],
     answer:
       "We accept bank transfer, card payment and payment on delivery where available. Customers receive payment confirmation before their order is processed.",
   },
@@ -156,6 +174,18 @@ const knowledgeBase = [
     keywords: ["return", "refund", "exchange", "wrong", "damaged", "replace"],
     answer:
       "Products can be returned or exchanged if they are damaged, wrong, or different from what was ordered. The customer should contact support within 24 hours of delivery.",
+  },
+  {
+    intent: "cancel_order",
+    keywords: ["cancel", "cancellation", "cancel my order"],
+    answer:
+      "You can cancel an order before it is dispatched. Please contact customer support with your order number as soon as possible. Orders that have already been dispatched follow the return policy.",
+  },
+  {
+    intent: "change_order",
+    keywords: ["change", "change my order", "modify", "edit my order", "change address", "change size"],
+    answer:
+      "You can change the size, colour or delivery address of an order before it is dispatched. Send your order number and the change you need to customer support.",
   },
   {
     intent: "order",
@@ -183,13 +213,13 @@ const knowledgeBase = [
   },
   {
     intent: "discount",
-    keywords: ["discount", "sale", "promo", "promotion", "coupon", "cheaper"],
+    keywords: ["discount", "discounts", "sale", "promo", "promotion", "coupon", "cheaper"],
     answer:
       "Shemar Collection offers discounts during selected promotions and seasonal sales. Follow our updates or contact customer support to learn about current offers.",
   },
   {
     intent: "store_location",
-    keywords: ["shop location", "store location", "address", "visit", "physical shop"],
+    keywords: ["shop location", "store location", "address", "visit", "physical shop", "physical"],
     answer:
       "You can contact Shemar Collection customer support for our current store address and directions before visiting the physical shop.",
   },
@@ -198,6 +228,60 @@ const knowledgeBase = [
     keywords: ["opening", "closing", "business hours", "working hours", "open today", "what time"],
     answer:
       "Our customer support service is available Monday to Saturday from 9:00 AM to 6:00 PM. Messages received outside these hours will be answered on the next working day.",
+  },
+  {
+    intent: "price",
+    keywords: ["price", "prices", "cost", "how much does", "expensive", "affordable", "budget"],
+    answer:
+      "Prices are shown on each product card. For example, scarves start from ₦18,500, handbags from ₦45,000 and evening dresses from ₦58,000.",
+  },
+  {
+    intent: "colours",
+    keywords: ["colour", "colours", "color", "colors", "other colour", "other colours"],
+    answer:
+      "Many of our items come in more than one colour. Tell customer support the product name and they will confirm which colours are currently available.",
+  },
+  {
+    intent: "quality",
+    keywords: ["original", "quality", "fabric", "material", "authentic", "genuine"],
+    answer:
+      "Shemar Collection sells carefully selected, quality women’s fashion. Fabric and material details are provided for each item, and customer support can share more photos on request.",
+  },
+  {
+    intent: "care_instructions",
+    keywords: ["wash", "washing", "iron", "dry clean", "care for", "care instructions", "fade"],
+    answer:
+      "Hand-wash delicate items in cold water, or dry-clean silk, embellished gowns and abayas. Iron on low heat on the reverse side and dry away from direct sunlight to protect the colour.",
+  },
+  {
+    intent: "custom_tailoring",
+    keywords: ["custom", "tailor", "tailoring", "sew", "made to measure", "customise", "customize", "bespoke"],
+    answer:
+      "Custom or made-to-measure requests can be discussed with customer support. Please share your measurements, the style you want and your deadline.",
+  },
+  {
+    intent: "occasion_wear",
+    keywords: ["wedding", "weddings", "bridal", "party", "parties", "occasion", "owambe", "event", "dinner"],
+    answer:
+      "For weddings, parties and special events, we recommend our luxury evening dresses, Ankara gowns, kaftans and gold jewelry sets. Customer support can help you style a complete look.",
+  },
+  {
+    intent: "new_arrivals",
+    keywords: ["new arrivals", "new arrival", "new collection", "latest", "restock", "new items"],
+    answer:
+      "New arrivals are added regularly. Check the Products section for the latest items, or ask customer support about restocks of a particular item.",
+  },
+  {
+    intent: "wholesale",
+    keywords: ["wholesale", "bulk", "reseller", "resell", "large order"],
+    answer:
+      "We accept bulk and wholesale orders. Contact customer support with the items and quantities you need for a price quote.",
+  },
+  {
+    intent: "gift",
+    keywords: ["gift", "gifts", "gift wrap", "gift wrapping", "wrapping", "present", "voucher"],
+    answer:
+      "Gift wrapping is available on request. Add a note at checkout or tell customer support, and we can also include a personal message with the order.",
   },
   {
     intent: "products",
@@ -240,6 +324,7 @@ const knowledgeBase = [
   },
   { intent: "account_access", keywords: ["log in", "login", "password", "sign in", "my account"], answer: "Please contact customer support for assistance with your account or password." },
   { intent: "complaint", keywords: ["complaint", "not been attended", "not resolved", "dissatisfied"], answer: "We are sorry your concern remains unresolved. Please request human support for follow-up." },
+  { intent: "thanks", keywords: ["thank", "thanks", "thank you", "bye", "goodbye"], answer: "You are welcome! Thank you for shopping with Shemar Collection. Ask me anything else at any time." },
   { intent: "service_information", keywords: ["what services", "services do you offer"], answer: "We assist customers with fashion products, ordering, delivery, payment, returns and account enquiries." },
 ];
 
@@ -593,6 +678,20 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     "Do you offer any discounts?",
     "Where is your physical shop?",
     "What are your business hours?",
+    "How much is delivery to Abuja?",
+    "How long does delivery take?",
+    "Do you ship outside Nigeria?",
+    "Can I cancel my order?",
+    "Can I change my order?",
+    "How much does the handbag cost?",
+    "What colours are available?",
+    "Are your products original?",
+    "How should I wash my dress?",
+    "Do you make custom outfits?",
+    "Do you have outfits for weddings?",
+    "Do you have new arrivals?",
+    "Do you sell wholesale?",
+    "Do you offer gift wrapping?",
   ];
 
   const sendMessage = (sampleMessage) => {

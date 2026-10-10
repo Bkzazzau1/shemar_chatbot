@@ -5,6 +5,7 @@ export const DEMO_STORAGE_KEY = "shemar_customer_support_demo_v1";
 export function initialDemoState(seedFaqs) {
   return {
     faqs: seedFaqs.map((faq) => ({ ...faq, id: faq.intent })),
+    seededFaqIds: seedFaqs.map((faq) => faq.intent),
     conversations: [],
     feedback: [],
     escalations: [],
@@ -19,10 +20,23 @@ export function loadDemoState(seedFaqs) {
         !Array.isArray(value.conversations) ||
         !Array.isArray(value.feedback) ||
         !Array.isArray(value.escalations)) return fallback;
-    return value;
+    return mergeNewSeedFaqs(value, seedFaqs);
   } catch {
     return fallback;
   }
+}
+
+// Adds FAQs introduced since this browser last saved, keeping seed order so keyword ties
+// resolve the same way for everyone. FAQs the administrator deleted are not brought back.
+function mergeNewSeedFaqs(state, seedFaqs) {
+  const seeded = new Set(state.seededFaqIds || []);
+  const byId = new Map(state.faqs.map((faq) => [faq.id, faq]));
+  const seedIds = new Set(seedFaqs.map((faq) => faq.intent));
+  const faqs = seedFaqs
+    .map((faq) => byId.get(faq.intent) || (seeded.has(faq.intent) ? null : { ...faq, id: faq.intent }))
+    .filter(Boolean)
+    .concat(state.faqs.filter((faq) => !seedIds.has(faq.id)));
+  return { ...state, faqs, seededFaqIds: [...new Set([...seeded, ...seedIds])] };
 }
 
 export function saveDemoState(state) {
