@@ -25,6 +25,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import dressImage from "./assets/product-dress.png";
 import handbagImage from "./assets/product-handbag.png";
 import heelsImage from "./assets/product-heels.png";
+import { initialDemoState, loadDemoState, saveDemoState, demoRecordId } from "./demoBackend.js";
 
 function Button({ children, className = "", size, variant, ...props }) {
   return (
@@ -237,33 +238,22 @@ const knowledgeBase = [
     answer:
       "You can contact Shemar Collection support through WhatsApp, phone call, or the customer support form on the website. A human support officer can assist when the chatbot cannot resolve the issue.",
   },
+  { intent: "account_access", keywords: ["log in", "login", "password", "sign in", "my account"], answer: "Please contact customer support for assistance with your account or password." },
+  { intent: "complaint", keywords: ["complaint", "not been attended", "not resolved", "dissatisfied"], answer: "We are sorry your concern remains unresolved. Please request human support for follow-up." },
+  { intent: "service_information", keywords: ["what services", "services do you offer"], answer: "We assist customers with fashion products, ordering, delivery, payment, returns and account enquiries." },
 ];
 
-function detectIntent(message) {
-  const text = message.toLowerCase();
-  let bestMatch = null;
+function detectIntent(message, faqs) {
+  // Rule/keyword matching for this browser-only demonstration, not a pretrained NLP model.
+  const text = " " + message.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim() + " ";
+  let best = null;
   let bestScore = 0;
-
-  knowledgeBase.forEach((item) => {
-    const score = item.keywords.reduce((total, keyword) => {
-      return text.includes(keyword) ? total + 1 : total;
-    }, 0);
-
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = item;
-    }
-  });
-
-  if (!bestMatch || bestScore === 0) {
-    return {
-      intent: "unknown",
-      answer:
-        "Sorry, I could not understand your request clearly. Please contact a customer service officer for further assistance.",
-    };
+  for (const faq of faqs) {
+    const score = faq.keywords.reduce((sum, word) =>
+      sum + (text.includes(" " + word.toLowerCase().trim() + " ") ? 1 : 0), 0);
+    if (score > bestScore) { best = faq; bestScore = score; }
   }
-
-  return bestMatch;
+  return best || { intent: "unknown", answer: "I could not match that enquiry. Please rephrase it or request human support." };
 }
 
 function Header({ cartCount }) {
@@ -583,11 +573,13 @@ const welcomeMessage = {
   intent: "greeting",
 };
 
-function ChatbotWidget({ open, setOpen }) {
+function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEscalation }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([welcomeMessage]);
   const [typing, setTyping] = useState(false);
   const [showSamples, setShowSamples] = useState(false);
+  const [rated, setRated] = useState([]);
+  const [escalated, setEscalated] = useState([]);
   const messagesEndRef = useRef(null);
 
   const sampleMessages = [
@@ -610,7 +602,8 @@ function ChatbotWidget({ open, setOpen }) {
     if (!cleanMessage) return;
 
     const userMessage = { sender: "user", text: cleanMessage };
-    const result = detectIntent(cleanMessage);
+    const result = detectIntent(cleanMessage, faqs);
+    const recordId = demoRecordId();
     setMessages((prev) => [...prev, userMessage]);
     setMessage("");
     setTyping(true);
@@ -619,8 +612,9 @@ function ChatbotWidget({ open, setOpen }) {
     window.setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: result.answer, intent: result.intent },
+        { sender: "bot", text: result.answer, intent: result.intent, recordId, question: cleanMessage },
       ]);
+      onConversation({ id: recordId, question: cleanMessage, answer: result.answer, intent: result.intent, createdAt: new Date().toISOString() });
       setTyping(false);
     }, 650);
   };
@@ -646,7 +640,7 @@ function ChatbotWidget({ open, setOpen }) {
               <div>
                 <h3 className="font-bold">AI Support Assistant</h3>
                 <p className="text-xs text-[#D4AF37]">
-                  Pre-trained NLP demo logic
+                  Keyword-based intent matching
                 </p>
               </div>
             </div>
@@ -691,6 +685,26 @@ function ChatbotWidget({ open, setOpen }) {
                     <p className="mt-2 text-[10px] uppercase tracking-wider text-[#D4AF37]">
                       Intent: {item.intent}
                     </p>
+                  )}
+                  {item.recordId && (
+                    <div className="mt-2 flex flex-wrap gap-2 border-t border-[#D4AF37]/20 pt-2">
+                      {["Helpful", "Not helpful"].map((rating) => (
+                        <button key={rating} disabled={rated.includes(item.recordId)}
+                          onClick={() => {
+                            onFeedback({ id: demoRecordId(), conversationId: item.recordId, question: item.question, rating, createdAt: new Date().toISOString() });
+                            setRated((list) => [...list, item.recordId]);
+                          }}
+                          className="rounded-md border border-[#D4AF37]/30 px-2 py-1 text-[10px] text-[#D4AF37] disabled:opacity-30">{rating}</button>
+                      ))}
+                      <button disabled={escalated.includes(item.recordId)}
+                        onClick={() => {
+                          onEscalation({ id: demoRecordId(), conversationId: item.recordId, question: item.question, status: "Pending", createdAt: new Date().toISOString() });
+                          setEscalated((list) => [...list, item.recordId]);
+                        }}
+                        className="rounded-md border border-white/20 px-2 py-1 text-[10px] text-white disabled:opacity-30">
+                        {escalated.includes(item.recordId) ? "Support requested" : "Request human support"}
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
@@ -772,54 +786,92 @@ function ChatbotWidget({ open, setOpen }) {
   );
 }
 
-function AdminPreview() {
-  return (
-    <section id="admin" className="bg-[#070707] py-16 text-white">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="mb-8 max-w-2xl">
-          <p className="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">
-            Admin Demo · Sample Data
-          </p>
-
-          <h2 className="mt-2 text-3xl font-black tracking-tight text-white md:text-4xl">
-            Chatbot management dashboard
-          </h2>
-
-          <p className="mt-4 leading-7 text-neutral-400">
-            This dashboard preview shows how the administrator can manage FAQs,
-            view conversation history, identify unanswered questions and monitor
-            chatbot activities for Shemar Collection.
-          </p>
-        </div>
-
-        <div className="grid gap-5 md:grid-cols-4">
-          {[
-            { title: "Total Chats", value: "124", icon: MessageCircle },
-            { title: "FAQ Records", value: "32", icon: LayoutDashboard },
-            { title: "Unanswered", value: "7", icon: Bot },
-            { title: "Human Escalation", value: "12", icon: UserRound },
-          ].map((item) => (
-            <Card
-              key={item.title}
-              className="rounded-3xl border border-[#D4AF37]/20 bg-[#111111] shadow-lg shadow-black/40"
-            >
-              <CardContent className="p-6">
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#D4AF37] text-black">
-                  <item.icon size={22} />
-                </div>
-
-                <p className="text-sm text-neutral-400">{item.title}</p>
-
-                <h3 className="mt-1 text-3xl font-black text-[#D4AF37]">
-                  {item.value}
-                </h3>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+function AdminPreview({ demo, saveFaq, deleteFaq, setStatus, resetDemo }) {
+  const [view, setView] = useState("FAQs");
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({ intent: "", keywords: "", answer: "" });
+  const [error, setError] = useState("");
+  const clear = () => { setEditing(null); setForm({ intent: "", keywords: "", answer: "" }); setError(""); };
+  const submit = (event) => {
+    event.preventDefault();
+    const intent = form.intent.trim().toLowerCase().replace(/\s+/g, "_");
+    const keywords = form.keywords.split(",").map((v) => v.trim().toLowerCase()).filter(Boolean);
+    if (!intent || !keywords.length || !form.answer.trim()) { setError("Complete all fields."); return; }
+    if (demo.faqs.some((x) => x.intent === intent && x.id !== editing)) { setError("Intent already exists."); return; }
+    saveFaq({ id: editing || demoRecordId(), intent, keywords, answer: form.answer.trim() });
+    clear();
+  };
+  const sections = {
+    FAQs: demo.faqs,
+    Conversations: demo.conversations,
+    Feedback: demo.feedback,
+    Escalations: demo.escalations,
+  };
+  return <section id="admin" className="bg-[#070707] py-16 text-white">
+    <div className="mx-auto max-w-7xl px-4">
+      <p className="font-semibold uppercase tracking-wider text-[#D4AF37]">Browser-local demonstration</p>
+      <h2 className="mt-3 text-3xl font-black">Interactive chatbot administration</h2>
+      <p className="mt-3 max-w-4xl text-sm leading-7 text-neutral-400">
+        This interface simulates backend behaviour in your browser. Records are stored only in this browser,
+        not on a server. There is no real login protection, central database, human-agent integration or pre-trained NLP model.
+        Do not enter actual customer or private information.
+      </p>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          ["Conversations", demo.conversations.length], ["FAQs", demo.faqs.length],
+          ["Feedback", demo.feedback.length], ["Pending escalations", demo.escalations.filter((x) => x.status === "Pending").length],
+        ].map(([label, value]) => <div key={label} className="rounded-2xl border border-[#D4AF37]/20 bg-[#111111] p-5">
+          <p className="text-xs text-neutral-400">{label}</p>
+          <p className="mt-2 text-3xl font-black text-[#D4AF37]">{value}</p>
+        </div>)}
       </div>
-    </section>
-  );
+      <div className="mt-8 flex flex-wrap gap-2">
+        {Object.keys(sections).map((name) => <button key={name} onClick={() => setView(name)}
+          className={view === name ? "rounded-xl bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-black" : "rounded-xl border border-[#D4AF37]/30 px-4 py-2 text-sm"}>
+          {name}</button>)}
+        <button className="ml-auto rounded-xl border border-white/30 px-4 py-2 text-sm" onClick={() => {
+          if (window.confirm("Reset all browser-local demonstration records?")) { resetDemo(); clear(); }
+        }}>Reset demo</button>
+      </div>
+      {view === "FAQs" && <form onSubmit={submit} className="mt-5 grid gap-3 rounded-2xl border border-[#D4AF37]/20 bg-[#111111] p-4 md:grid-cols-[1fr_1fr_2fr_auto]">
+        <input aria-label="Intent name" placeholder="Intent name" value={form.intent}
+          onChange={(e) => setForm((x) => ({ ...x, intent: e.target.value }))} className="rounded-lg border border-white/20 bg-black p-2 text-sm" />
+        <input aria-label="Comma separated keywords" placeholder="Keywords, comma separated" value={form.keywords}
+          onChange={(e) => setForm((x) => ({ ...x, keywords: e.target.value }))} className="rounded-lg border border-white/20 bg-black p-2 text-sm" />
+        <textarea aria-label="Prepared answer" placeholder="Prepared answer" rows={2} value={form.answer}
+          onChange={(e) => setForm((x) => ({ ...x, answer: e.target.value }))} className="rounded-lg border border-white/20 bg-black p-2 text-sm" />
+        <div className="flex flex-col gap-2"><button type="submit" className="rounded-lg bg-[#D4AF37] px-4 py-2 text-sm font-semibold text-black">Save</button>
+          <button type="button" onClick={clear} className="rounded-lg border border-white/20 px-4 py-2 text-sm">Clear</button></div>
+        {error && <p className="text-xs text-red-300">{error}</p>}
+      </form>}
+      <div className="mt-5 max-h-[35rem] space-y-3 overflow-y-auto">
+        {sections[view].map((row) => <div key={row.id} className="rounded-2xl border border-white/15 bg-[#111111] p-4 text-sm">
+          {view === "FAQs" ? <>
+            <h3 className="font-bold text-[#D4AF37]">{row.intent}</h3>
+            <p className="mt-1 text-xs text-neutral-400">{row.keywords.join(", ")}</p>
+            <p className="mt-2">{row.answer}</p>
+            <div className="mt-3 flex gap-4">
+              <button className="text-[#D4AF37] underline" onClick={() => {
+                setEditing(row.id); setForm({ intent: row.intent, keywords: row.keywords.join(", "), answer: row.answer }); setError("");
+              }}>Edit</button>
+              <button className="text-red-300 underline" onClick={() => {
+                if (window.confirm("Delete this demo FAQ?")) deleteFaq(row.id);
+              }}>Delete</button>
+            </div>
+          </> : <>
+            <p className="text-xs text-[#D4AF37]">{row.intent || row.rating || row.status || "Customer enquiry"} · {new Date(row.createdAt).toLocaleString()}</p>
+            <p className="mt-2">{row.question}</p>
+            {row.answer && <p className="mt-2 text-neutral-400">{row.answer}</p>}
+            {view === "Escalations" && <select value={row.status} onChange={(e) => setStatus(row.id, e.target.value)}
+              aria-label="Demo escalation status" className="mt-3 rounded-lg border border-[#D4AF37]/30 bg-black p-2 text-[#D4AF37]">
+              <option value="Pending">Pending</option><option value="In review">In review</option><option value="Resolved">Resolved (demo)</option>
+            </select>}
+          </>}
+        </div>)}
+        {!sections[view].length && <p className="text-sm text-neutral-400">No records yet. Try the chat demonstration.</p>}
+      </div>
+    </div>
+  </section>;
 }
 
 function HowItWorks() {
@@ -864,6 +916,10 @@ export default function ShemarCollectionChatbotDemo() {
   const [cartCount, setCartCount] = useState(0);
   const [chatOpen, setChatOpen] = useState(true);
   const [cartNotice, setCartNotice] = useState("");
+  const [demo, setDemo] = useState(() => loadDemoState(knowledgeBase));
+  useEffect(() => { saveDemoState(demo); }, [demo]);
+  const addRecord = (key, row) => setDemo((state) => ({ ...state, [key]: [row, ...state[key]] }));
+  const saveFaq = (row) => setDemo((state) => ({ ...state, faqs: state.faqs.some((v) => v.id === row.id) ? state.faqs.map((v) => v.id === row.id ? row : v) : [...state.faqs, row] }));
 
   const addToCart = (product) => {
     setCartCount((count) => count + 1);
@@ -878,12 +934,15 @@ export default function ShemarCollectionChatbotDemo() {
       <ServiceHighlights />
       <Products onAddToCart={addToCart} />
       <HowItWorks />
-      <AdminPreview />
+      <AdminPreview demo={demo} saveFaq={saveFaq}
+        deleteFaq={(id) => setDemo((state) => ({ ...state, faqs: state.faqs.filter((v) => v.id !== id) }))}
+        setStatus={(id, status) => setDemo((state) => ({ ...state, escalations: state.escalations.map((v) => v.id === id ? { ...v, status } : v) }))}
+        resetDemo={() => setDemo(initialDemoState(knowledgeBase))} />
 
       <footer className="border-t border-[#D4AF37]/20 bg-black px-4 py-10 text-center text-sm text-neutral-500">
         <p>
           © 2026 Shemar Collection. Premium women’s fashion e-commerce demo for
-          AI-Based Customer Service Chatbot Using Pre-trained NLP Models.
+          Keyword-based customer support demonstration. No real backend or deployed NLP model.
         </p>
       </footer>
 
@@ -896,7 +955,10 @@ export default function ShemarCollectionChatbotDemo() {
           <span className="mr-2 text-[#D4AF37]">✓</span>{cartNotice}
         </motion.div>
       )}
-      <ChatbotWidget open={chatOpen} setOpen={setChatOpen} />
+      <ChatbotWidget open={chatOpen} setOpen={setChatOpen} faqs={demo.faqs}
+        onConversation={(row) => addRecord("conversations", row)}
+        onFeedback={(row) => addRecord("feedback", row)}
+        onEscalation={(row) => addRecord("escalations", row)} />
     </div>
   );
 }
