@@ -684,6 +684,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
   const [showSamples, setShowSamples] = useState(false);
   const [rated, setRated] = useState([]);
   const [escalated, setEscalated] = useState([]);
+  const [conversationFinished, setConversationFinished] = useState(false);
   const lastMessage = messages[messages.length - 1];
   const latestReply = !typing && lastMessage?.sender === "bot" && lastMessage.recordId ? lastMessage : null;
   const messagesEndRef = useRef(null);
@@ -732,6 +733,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     setMessage("");
     setTyping(true);
     setShowSamples(false);
+    setConversationFinished(false);
 
     window.setTimeout(() => {
       setMessages((prev) => [
@@ -771,7 +773,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
 
             <div className="flex items-center gap-1">
               <button
-                onClick={() => { setMessages([welcomeMessage]); setRated([]); setEscalated([]); }}
+                onClick={() => { setMessages([welcomeMessage]); setRated([]); setEscalated([]); setConversationFinished(false); }}
                 className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-[#D4AF37]"
                 aria-label="Clear conversation"
                 title="Clear conversation"
@@ -830,45 +832,69 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
               </div>
             )}
 
+
             {latestReply && (
               <div className="space-y-3 rounded-2xl border border-[#D4AF37]/25 bg-[#1A1813] p-3.5" aria-label="Conversation options">
-                <p className="text-[11px] font-semibold tracking-wide text-[#D4AF37]">You can also ask</p>
-                <div className="flex flex-wrap gap-2">
-                  {(latestReply.suggestions || []).slice(0, 3).map((suggestion) => (
-                    <button type="button" key={suggestion} disabled={typing} onClick={() => sendMessage(suggestion)}
-                      className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2 text-left text-[11px] leading-4 text-[#F2E5C2] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/15">
-                      {suggestion}
-                    </button>
-                  ))}
-                </div>
-                <div className="border-t border-[#D4AF37]/20 pt-3">
-                  <p className="mb-2 text-[11px] text-[#B6AD96]">
-                    {rated.includes(latestReply.recordId) ? "Thank you for your feedback!" : "Was this conversation helpful?"}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {!rated.includes(latestReply.recordId) && ["Helpful", "Not helpful"].map((rating) => (
-                      <button key={rating} type="button"
-                        onClick={() => {
-                          onFeedback({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, rating, createdAt: new Date().toISOString() });
-                          setRated((current) => [...current, latestReply.recordId]);
-                        }}
-                        className="rounded-lg border border-[#D4AF37]/40 px-3 py-2 text-[11px] text-[#ECD28A] transition hover:bg-[#D4AF37]/15">
-                        {rating === "Helpful" ? "👍 Helpful" : "👎 Not helpful"}
+                {!conversationFinished && (
+                  <>
+                    <p className="text-[11px] font-semibold tracking-wide text-[#D4AF37]">You can also ask</p>
+                    <div className="flex flex-wrap gap-2">
+                      {(latestReply.suggestions || []).slice(0, 3).map((suggestion) => (
+                        <button type="button" key={suggestion} onClick={() => sendMessage(suggestion)}
+                          className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2 text-left text-[11px] leading-4 text-[#F2E5C2] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/15">
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex flex-wrap gap-2 border-t border-[#D4AF37]/20 pt-3">
+                      <button type="button" onClick={() => setConversationFinished(true)}
+                        className="rounded-lg bg-[#D4AF37] px-3 py-2 text-[11px] font-semibold text-[#1A160F] transition hover:bg-[#F0D681]">
+                        Finish conversation
                       </button>
-                    ))}
-                    <button type="button" disabled={escalated.includes(latestReply.recordId)}
-                      onClick={() => {
-                        onEscalation({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, status: "Pending", createdAt: new Date().toISOString() });
-                        setEscalated((current) => [...current, latestReply.recordId]);
-                      }}
-                      className="rounded-lg border border-white/25 px-3 py-2 text-[11px] font-medium text-[#F3F0E7] transition hover:border-[#D4AF37]/60 disabled:cursor-default disabled:opacity-60">
-                      {escalated.includes(latestReply.recordId) ? "Demo request recorded" : "Request human support"}
+                      <button type="button" disabled={escalated.includes(latestReply.recordId)}
+                        onClick={() => {
+                          onEscalation({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, status: "Pending", createdAt: new Date().toISOString() });
+                          setEscalated((current) => [...current, latestReply.recordId]);
+                        }}
+                        className="rounded-lg border border-white/25 px-3 py-2 text-[11px] font-medium text-[#F3F0E7] transition hover:border-[#D4AF37]/60 disabled:cursor-default disabled:opacity-60">
+                        {escalated.includes(latestReply.recordId) ? "Demo request recorded" : "Request human support"}
+                      </button>
+                    </div>
+                    {escalated.includes(latestReply.recordId) && (
+                      <p className="text-[10px] leading-4 text-[#AFA996]">This request is saved in the demo dashboard; no real agent is contacted.</p>
+                    )}
+                  </>
+                )}
+                {conversationFinished && (
+                  <div className="space-y-3" aria-label="End-of-conversation feedback">
+                    <p className="text-sm font-semibold text-[#F4E5BD]">Thank you for chatting with Shemar!</p>
+                    <p className="text-xs leading-5 text-[#B6AD96]">
+                      {rated.includes(latestReply.recordId)
+                        ? "Your feedback has been recorded in this browser."
+                        : "Before you go, was the conversation helpful?"}
+                    </p>
+                    {!rated.includes(latestReply.recordId) && (
+                      <div className="flex flex-wrap gap-2">
+                        {["Helpful", "Not helpful"].map((rating) => (
+                          <button key={rating} type="button" onClick={() => {
+                            onFeedback({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, rating, createdAt: new Date().toISOString() });
+                            setRated((current) => [...current, latestReply.recordId]);
+                          }} className="rounded-lg border border-[#D4AF37]/40 px-3 py-2 text-xs text-[#ECD28A] transition hover:bg-[#D4AF37]/15">
+                            {rating === "Helpful" ? "👍 Helpful" : "👎 Not helpful"}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <button type="button" onClick={() => {
+                      setMessages([welcomeMessage]);
+                      setRated([]);
+                      setEscalated([]);
+                      setConversationFinished(false);
+                    }} className="text-[11px] font-semibold text-[#D4AF37] underline underline-offset-4">
+                      Start a new conversation
                     </button>
                   </div>
-                  {escalated.includes(latestReply.recordId) && (
-                    <p className="mt-2 text-[10px] leading-4 text-[#AFA996]">Saved in the demo dashboard only. No real support agent has been contacted.</p>
-                  )}
-                </div>
+                )}
               </div>
             )}
             <div ref={messagesEndRef} />
