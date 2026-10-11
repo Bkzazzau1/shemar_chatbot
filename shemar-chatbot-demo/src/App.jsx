@@ -26,6 +26,7 @@ import dressImage from "./assets/product-dress.png";
 import handbagImage from "./assets/product-handbag.png";
 import heelsImage from "./assets/product-heels.png";
 import { initialDemoState, loadDemoState, saveDemoState, demoRecordId } from "./demoBackend.js";
+import { answerCustomer } from "./chatEngine.js";
 
 function Button({ children, className = "", size, variant, ...props }) {
   return (
@@ -325,21 +326,21 @@ const knowledgeBase = [
   { intent: "account_access", keywords: ["log in", "login", "password", "sign in", "my account"], answer: "Please contact customer support for assistance with your account or password." },
   { intent: "complaint", keywords: ["complaint", "not been attended", "not resolved", "dissatisfied"], answer: "We are sorry your concern remains unresolved. Please request human support for follow-up." },
   { intent: "thanks", keywords: ["thank", "thanks", "thank you", "bye", "goodbye"], answer: "You are welcome! Thank you for shopping with Shemar Collection. Ask me anything else at any time." },
-  { intent: "service_information", keywords: ["what services", "services do you offer"], answer: "We assist customers with fashion products, ordering, delivery, payment, returns and account enquiries." },
+  { intent: "service_information", keywords: ["what services", "services do you offer", "what can you help with", "how does it work"], answer: "I can help explain the sample collection, prices, sizing, delivery, payment options, returns and order questions. This is a demonstration, so real orders and payments are not connected." },
+  { intent: "payment_confirmation", keywords: ["payment confirmation", "i have paid", "i paid", "transfer receipt", "payment pending", "payment successful", "payment not reflecting"], answer: "Once a real payment has been made, the shop must confirm it through its verified payment channel. This demo cannot check transactions." },
+  { intent: "pay_on_delivery", keywords: ["pay on delivery", "cash on delivery", "payment on delivery", "pay when it arrives"], answer: "Payment on delivery depends on the merchant and destination. It is mentioned in this demo's sample policies, but confirm whether it is offered for a real order before relying on it." },
+  { intent: "wrong_item", keywords: ["wrong item", "incorrect item", "wrong colour sent", "wrong size sent", "sent the wrong item"], answer: "Sorry if an order arrives different from what you selected. Keep the packaging and order details, take a clear photo and contact the shop through its verified support channel for an exchange review." },
+  { intent: "damaged_item", keywords: ["arrived damaged", "damaged package", "item is damaged", "defective product", "torn dress"], answer: "If an item arrives damaged, keep the packaging, take photos of the problem and contact the seller promptly with the order reference. This demo cannot create a real return ticket." },
+  { intent: "checkout_support", keywords: ["checkout not working", "cannot checkout", "can't checkout", "cart error", "checkout error"], answer: "This storefront demonstrates adding products to a cart counter, but it does not process real checkouts. Please use the merchant's verified shop for orders and payments." },
+  { intent: "gift_delivery", keywords: ["send as a gift", "send to someone", "gift for someone", "deliver a gift"], answer: "A gift order would need the recipient's delivery arrangements confirmed by the shop. Gift wrapping is shown as a sample service, not a confirmed live order option." },
+  { intent: "returns_eligibility", keywords: ["return after", "refund timeline", "return window", "how many days to return"], answer: "The demonstration FAQ refers to contacting support within 24 hours of delivery for an issue. Actual return eligibility and refund timing must be confirmed against the shop's current policies." },
+  { intent: "store_pickup", keywords: ["can i collect", "pick up", "pickup", "collect in person", "self collection"], answer: "Collection arrangements depend on whether the shop has an active pickup location. This demo has no verified collection address, so confirm arrangements directly before travelling." },
+  { intent: "delivery_address", keywords: ["change delivery address", "wrong address", "update my address", "delivery address change"], answer: "If you need to change an address, contact the shop with your order reference before dispatch. This demo does not update real orders or addresses." },
+  { intent: "privacy", keywords: ["is this secure", "is my information safe", "privacy", "personal information", "card details", "is my data saved"], answer: "This chat is a browser-only demonstration. Conversation records are saved locally in this browser for the demo administrator view. Do not enter private account details, payment information or passwords." },
+  { intent: "preorder", keywords: ["preorder", "pre order", "reserve an item", "out of stock"], answer: "This sample catalogue is not linked to stock or reservations. A real preorder can only be confirmed by the shop through its official contact channel." },
+  { intent: "order_number", keywords: ["where do i find my order number", "lost my order number", "order reference", "order id"], answer: "A real order reference is usually in an order confirmation message or receipt. This demo does not generate order numbers or retrieve purchases. Please ask the shop if you cannot find yours." },
 ];
 
-function detectIntent(message, faqs) {
-  // Rule/keyword matching for this browser-only demonstration, not a pretrained NLP model.
-  const text = " " + message.toLowerCase().replace(/[^a-z0-9\s]/g, " ").replace(/\s+/g, " ").trim() + " ";
-  let best = null;
-  let bestScore = 0;
-  for (const faq of faqs) {
-    const score = faq.keywords.reduce((sum, word) =>
-      sum + (text.includes(" " + word.toLowerCase().trim() + " ") ? 1 : 0), 0);
-    if (score > bestScore) { best = faq; bestScore = score; }
-  }
-  return best || { intent: "unknown", answer: "I could not match that enquiry. Please rephrase it or request human support." };
-}
 
 function Header({ cartCount, page, onTryChatbot }) {
   const [open, setOpen] = useState(false);
@@ -671,7 +672,7 @@ function Products({ onAddToCart }) {
 
 const welcomeMessage = {
   sender: "bot",
-  text: "Hello, welcome to Shemar Collection. Ask me about women clothes, scarves, bags, dresses, delivery, payment, returns, order tracking or customer support.",
+  text: "Hello! Welcome to Shemar Collection. Looking for a style, checking delivery, or need help with an order? Tell me what you need, or choose a question below. This is a shop demonstration, not a live order service.",
   intent: "greeting",
 };
 
@@ -686,29 +687,31 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
 
   const sampleMessages = [
     "What products do you sell?",
-    "Do you deliver to Kaduna?",
-    "How can I make payment?",
-    "What is your return policy?",
-    "How do I track my order?",
-    "What sizes do you have?",
-    "Is this item still available?",
-    "Do you offer any discounts?",
-    "Where is your physical shop?",
-    "What are your business hours?",
+    "How much is the black evening dress?",
+    "Is the handbag in stock?",
+    "Do you have a size guide?",
+    "What colours are available?",
+    "Do you deliver to Kano?",
     "How much is delivery to Abuja?",
     "How long does delivery take?",
+    "Can I change my delivery address?",
     "Do you ship outside Nigeria?",
+    "How do I place an order?",
+    "How do I track my order?",
     "Can I cancel my order?",
-    "Can I change my order?",
-    "How much does the handbag cost?",
-    "What colours are available?",
-    "Are your products original?",
-    "How should I wash my dress?",
+    "Can I collect my order?",
+    "Can I pay on delivery?",
+    "How do I confirm my payment?",
+    "What if I receive the wrong item?",
+    "My dress arrived damaged",
+    "What is your return policy?",
+    "Can I exchange my size?",
+    "Do you have discounts?",
+    "Can you gift wrap an item?",
     "Do you make custom outfits?",
-    "Do you have outfits for weddings?",
-    "Do you have new arrivals?",
-    "Do you sell wholesale?",
-    "Do you offer gift wrapping?",
+    "What are your business hours?",
+    "What information does this demo store?",
+    "Can I speak to a person?",
   ];
 
   const sendMessage = (sampleMessage) => {
@@ -718,7 +721,9 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     if (!cleanMessage) return;
 
     const userMessage = { sender: "user", text: cleanMessage };
-    const result = detectIntent(cleanMessage, faqs);
+    const previousReply = [...messages].reverse().find((item) => item.sender === "bot" && item.recordId);
+    const result = answerCustomer(cleanMessage, faqs, { lastIntent: previousReply?.intent }, products);
+    if (!result) return;
     const recordId = demoRecordId();
     setMessages((prev) => [...prev, userMessage]);
     setMessage("");
@@ -728,7 +733,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     window.setTimeout(() => {
       setMessages((prev) => [
         ...prev,
-        { sender: "bot", text: result.answer, intent: result.intent, recordId, question: cleanMessage },
+        { sender: "bot", text: result.answer, intent: result.intent, recordId, question: cleanMessage, suggestions: result.suggestions },
       ]);
       onConversation({ id: recordId, question: cleanMessage, answer: result.answer, intent: result.intent, createdAt: new Date().toISOString() });
       setTyping(false);
