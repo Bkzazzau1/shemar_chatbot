@@ -5,13 +5,15 @@ const extraPhrases = {
   delivery_time: ["when will my order arrive", "how soon", "how quickly", "delivery timeline", "how long does shipping take", "same day", "next day"],
   international_shipping: ["ship internationally", "deliver to uk", "ship to ghana", "ship to usa"],
   tracking: ["where is my order", "order status", "parcel status", "has my order been sent", "where is my package"],
-  payment_confirmation: ["payment successful", "payment confirmation", "payment receipt", "transfer receipt", "i have paid", "i paid", "payment not reflecting"],
+  payment_confirmation: ["payment successful", "payment confirmation", "payment receipt", "transfer receipt", "i have paid", "i paid", "payment not reflecting", "confirm my payment", "confirm payment", "payment received"],
   pay_on_delivery: ["cash on delivery", "pay on delivery", "payment on delivery", "pay when it arrives"],
-  return_policy: ["item does not fit", "doesnt fit", "return an item", "return my item", "exchange an item"],
+  delivery_address: ["change my delivery address", "change delivery address", "update delivery address", "address for delivery"],
+  size_exchange: ["exchange for another size", "exchange my size", "can i exchange the size", "swap to another size"],
+  return_policy: ["item does not fit", "doesnt fit", "return an item", "return my item", "exchange an item", "return policy"],
   wrong_item: ["wrong item", "incorrect item", "wrong colour sent", "wrong size sent", "sent the wrong"],
   damaged_item: ["arrived damaged", "damaged package", "item is damaged", "torn dress", "broken item", "defective product"],
-  stock_availability: ["do you have", "is it in stock", "is it available", "still in stock", "available in medium"],
-  size_guide: ["which size", "what size", "size chart", "will this fit", "measurement chart"],
+  stock_availability: ["do you have", "is it in stock", "is it available", "still in stock", "available in medium", "in stock"],
+  size_guide: ["which size", "what size", "size chart", "will this fit", "measurement chart", "size guide"],
   price: ["how much is the", "how much does the", "price of", "cost of the", "what does it cost", "price for"],
   order: ["how to order", "place an order", "buy online", "how do i buy", "checkout"],
   checkout_support: ["checkout not working", "cannot checkout", "cant checkout", "cart error"],
@@ -76,7 +78,8 @@ function scoreFaq(text, faq) {
     strongest = Math.max(strongest, words > 1 ? 8 + words * 5 : 2);
     matches++;
   }
-  return strongest + Math.min(matches, 5);
+  const specificIntents = new Set(["pay_on_delivery", "payment_confirmation", "wrong_item", "damaged_item", "size_exchange", "delivery_address", "checkout_support", "store_pickup", "returns_eligibility", "gift_delivery"]);
+  return strongest ? strongest + Math.min(matches, 5) + (specificIntents.has(faq.intent) ? 8 : 0) : 0;
 }
 function contextualFollowup(text) {
   return /^(what about|how about|and |what if|is it|do you also|does it|same for|for |okay and|ok and|can you)/.test(text)
