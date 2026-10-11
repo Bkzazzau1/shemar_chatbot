@@ -39,7 +39,7 @@ function Button({ children, className = "", size, variant, ...props }) {
 }
 
 function Card({ children, className = "" }) {
-  return <div className={`bg-white ${className}`}>{children}</div>;
+  return <div className={className}>{children}</div>;
 }
 
 function CardContent({ children, className = "" }) {
@@ -61,7 +61,7 @@ const products = [
     category: "Scarf",
     price: "₦18,500",
     rating: 4.8,
-    image: dressImage,
+    image: null,
   },
   {
     id: 3,
@@ -85,7 +85,7 @@ const products = [
     category: "Abaya",
     price: "₦52,000",
     rating: 4.9,
-    image: dressImage,
+    image: null,
   },
   {
     id: 6,
@@ -93,7 +93,7 @@ const products = [
     category: "Kaftan",
     price: "₦48,500",
     rating: 4.8,
-    image: dressImage,
+    image: null,
   },
   {
     id: 7,
@@ -101,7 +101,7 @@ const products = [
     category: "Corporate Wear",
     price: "₦42,000",
     rating: 4.6,
-    image: dressImage,
+    image: null,
   },
   {
     id: 8,
@@ -117,7 +117,7 @@ const products = [
     category: "Accessories",
     price: "₦25,000",
     rating: 4.8,
-    image: handbagImage,
+    image: null,
   },
 ];
 
@@ -559,94 +559,114 @@ function ServiceHighlights() {
 
 function Products({ onAddToCart }) {
   const [query, setQuery] = useState("");
+  const [category, setCategory] = useState("All");
+  const categories = ["All", ...new Set(products.map((product) => product.category))];
 
   const filtered = useMemo(() => {
+    const term = query.trim().toLowerCase();
     return products.filter((product) =>
-      `${product.name} ${product.category}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
+      (category === "All" || product.category === category) &&
+      `${product.name} ${product.category}`.toLowerCase().includes(term)
     );
-  }, [query]);
+  }, [query, category]);
 
   return (
-    <section id="products" className="bg-black px-4 py-16 text-white">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+    <section id="products" className="shemar-products relative overflow-hidden bg-[#080807] px-4 py-16 text-white sm:px-6 md:py-24">
+      <div className="pointer-events-none absolute left-[-10rem] top-32 h-96 w-96 rounded-full bg-[#D4AF37]/5 blur-[100px]" />
+      <div className="relative mx-auto max-w-7xl">
+        <div className="mb-9 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-wider text-[#D4AF37]">
-              Women’s Collection
+            <p className="shemar-eyebrow flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.28em] text-[#D4AF37]">
+              <span className="h-px w-8 bg-[#D4AF37]" /> Curated by Shemar
             </p>
-            <h2 className="mt-2 text-3xl font-black tracking-tight text-white md:text-4xl">
-              Luxury fashion items for women
+            <h2 className="shemar-display mt-3 text-4xl font-semibold leading-tight text-[#F7F2E8] sm:text-5xl">
+              The Collection<span className="text-[#D4AF37]">.</span>
             </h2>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-neutral-400">
-              Explore premium dresses, scarves, bags, abayas, kaftans, corporate
-              wear, heels and fashion accessories designed for elegant women.
+            <p className="mt-3 max-w-xl text-sm leading-7 text-[#A8A49B] sm:text-base">
+              Beautifully considered pieces for everyday elegance and unforgettable occasions.
             </p>
           </div>
-
-          <div className="flex items-center gap-2 rounded-2xl border border-[#D4AF37]/30 bg-[#111111] px-4 py-3 shadow-sm md:w-80">
-            <Search size={18} className="text-[#D4AF37]" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search women fashion..."
-              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-500"
-            />
-          </div>
+          <label className="flex w-full items-center gap-3 rounded-2xl border border-[#D4AF37]/25 bg-[#171613] px-4 py-3.5 text-[#D4AF37] shadow-lg shadow-black/20 focus-within:border-[#D4AF37]/70 lg:max-w-sm">
+            <Search size={18} aria-hidden="true" />
+            <input value={query} onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search the collection..." aria-label="Search products"
+              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-[#928E85]" />
+            {query && <button type="button" onClick={() => setQuery("")} aria-label="Clear search" className="text-[#BDB6A5] hover:text-white"><X size={16} /></button>}
+          </label>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((product) => (
-            <Card
-              key={product.id}
-              className="group overflow-hidden rounded-[1.7rem] border border-[#D4AF37]/20 bg-[#111111] shadow-lg shadow-black/40 transition hover:-translate-y-1 hover:border-[#D4AF37]/60 hover:shadow-[#D4AF37]/10"
-            >
-              <CardContent className="p-4">
-                <div className="h-48 overflow-hidden rounded-[1.3rem] border border-[#D4AF37]/20 bg-black">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                </div>
-
-                <div className="mt-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <p className="rounded-full bg-[#D4AF37]/10 px-3 py-1 text-xs font-semibold text-[#D4AF37]">
-                      {product.category}
-                    </p>
-
-                    <p className="flex items-center gap-1 text-sm text-neutral-400">
-                      <Star
-                        size={14}
-                        className="fill-[#D4AF37] text-[#D4AF37]"
-                      />{" "}
-                      {product.rating}
-                    </p>
-                  </div>
-
-                  <h3 className="mt-3 text-lg font-bold text-white">
-                    {product.name}
-                  </h3>
-
-                  <div className="mt-4 flex items-center justify-between">
-                    <p className="text-xl font-black text-[#D4AF37]">
-                      {product.price}
-                    </p>
-
-                    <Button
-                      onClick={() => onAddToCart(product)}
-                      className="rounded-2xl bg-[#D4AF37] text-black hover:bg-[#f0cc5a]"
-                    >
-                      Add to Cart
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        <div className="shemar-filters mb-7 flex items-center gap-2 overflow-x-auto pb-3" role="group" aria-label="Product categories">
+          {categories.map((item) => (
+            <button key={item} type="button" aria-pressed={category === item} onClick={() => setCategory(item)}
+              className={`whitespace-nowrap rounded-full border px-4 py-2 text-xs font-semibold transition sm:text-sm ${
+                category === item
+                  ? "border-[#D4AF37] bg-[#D4AF37] text-[#17130B] shadow-md shadow-[#D4AF37]/10"
+                  : "border-white/15 bg-white/[0.035] text-[#BBB5A9] hover:border-[#D4AF37]/50 hover:text-[#F5DF9B]"
+              }`}>
+              {item === "All" ? "All pieces" : item}
+            </button>
           ))}
         </div>
+        <div className="mb-5 flex items-center justify-between gap-3 border-b border-white/10 pb-4 text-xs text-[#A8A49B]">
+          <span>{filtered.length} {filtered.length === 1 ? "piece" : "pieces"} in view</span>
+          <span className="hidden sm:inline">The Shemar edit · Demonstration catalogue</span>
+        </div>
+
+        {filtered.length ? (
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:gap-6">
+            {filtered.map((product, index) => (
+              <article key={product.id}
+                className="shemar-product-card group flex min-w-0 flex-col overflow-hidden rounded-[1.6rem] border border-[#E0C879]/15 bg-[#131210] transition-all duration-300 hover:-translate-y-1 hover:border-[#D4AF37]/55 hover:shadow-[0_25px_60px_-35px_rgba(212,175,55,.4)]">
+                <div className="shemar-product-image relative aspect-[5/4] overflow-hidden bg-[#211C17]">
+                  {product.image ? (
+                    <img src={product.image} alt={product.name} loading={index > 2 ? "lazy" : "eager"}
+                      className="h-full w-full object-cover object-center transition duration-700 group-hover:scale-[1.07]" />
+                  ) : (
+                    <div className="shemar-product-placeholder flex h-full flex-col items-center justify-center gap-3 px-6 text-center"
+                      aria-label={`Image not yet available for ${product.name}`}>
+                      <div className="flex h-16 w-16 items-center justify-center rounded-full border border-[#D4AF37]/30 bg-black/30 text-[#D4AF37]">
+                        <Gem size={26} strokeWidth={1.2} />
+                      </div>
+                      <span className="shemar-display text-2xl text-[#F4E7C9]">{product.category}</span>
+                      <span className="text-[10px] uppercase tracking-[.25em] text-[#BEAA7A]">Photo coming soon</span>
+                    </div>
+                  )}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                  <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/65 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#F7E7B8] backdrop-blur-sm">
+                    {product.category}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col p-5 sm:p-6">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="shemar-display text-[1.45rem] font-semibold leading-snug text-[#F6F2EA] sm:text-[1.65rem]">{product.name}</h3>
+                    <span className="mt-1 flex shrink-0 items-center gap-1 text-xs text-[#D7C18A]" title="Sample catalogue rating">
+                      <Star size={13} fill="currentColor" />{product.rating}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-xs text-[#9E998F]">Shemar Collection · Fashion edit</p>
+                  <div className="mt-auto flex items-center justify-between gap-3 border-t border-[#D4AF37]/15 pt-4" style={{ marginTop: "1.6rem" }}>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[.16em] text-[#9E998F]">Price</p>
+                      <p className="mt-0.5 text-xl font-bold tracking-tight text-[#F1D37E]">{product.price}</p>
+                    </div>
+                    <button type="button" onClick={() => onAddToCart(product)}
+                      aria-label={`Add ${product.name} to cart`}
+                      className="inline-flex shrink-0 items-center gap-2 rounded-full bg-[#D4AF37] px-4 py-3 text-xs font-semibold text-[#18130A] shadow-lg shadow-black/20 transition hover:bg-[#F0D681] active:scale-95 sm:px-5 sm:text-sm">
+                      <ShoppingBag size={16} /> Add to cart
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-3 rounded-[1.5rem] border border-dashed border-[#D4AF37]/25 bg-[#14120F] px-6 py-16 text-center">
+            <Search size={30} className="text-[#D4AF37]" />
+            <h3 className="shemar-display text-2xl text-white">No matching pieces</h3>
+            <p className="text-sm text-[#AFA99E]">Try another search or browse the full collection.</p>
+            <button type="button" onClick={() => { setQuery(""); setCategory("All"); }} className="mt-2 rounded-full border border-[#D4AF37]/40 px-5 py-2 text-sm text-[#F3D579] hover:bg-[#D4AF37]/10">View all pieces</button>
+          </div>
+        )}
       </div>
     </section>
   );
