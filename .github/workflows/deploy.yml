@@ -34,6 +34,10 @@ jobs:
         run: npm ci
         working-directory: shemar-chatbot-demo
 
+      - name: Run chatbot conversation tests
+        run: npm test
+        working-directory: shemar-chatbot-demo
+
       - name: Build website
         run: npm run build
         working-directory: shemar-chatbot-demo
