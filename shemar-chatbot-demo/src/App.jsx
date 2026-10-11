@@ -168,13 +168,13 @@ const knowledgeBase = [
     intent: "payment",
     keywords: ["payment", "pay", "card", "transfer", "bank", "cash", "pos", "pay on delivery", "payment on delivery"],
     answer:
-      "We accept bank transfer, card payment and payment on delivery where available. Customers receive payment confirmation before their order is processed.",
+      "This demonstration describes bank transfer and card payment as possible shop options. No real payment is accepted here. The shop must confirm the payment methods available for your order and destination.",
   },
   {
     intent: "return_policy",
     keywords: ["return", "refund", "exchange", "wrong", "damaged", "replace"],
     answer:
-      "Products can be returned or exchanged if they are damaged, wrong, or different from what was ordered. The customer should contact support within 24 hours of delivery.",
+      "The example return policy says to contact the shop promptly, ideally within 24 hours, if an item is damaged or incorrect. A real exchange or refund depends on the shop's current terms; this demonstration does not process returns.",
   },
   {
     intent: "cancel_order",
@@ -192,7 +192,7 @@ const knowledgeBase = [
     intent: "order",
     keywords: ["order", "buy", "place", "purchase", "cart", "checkout"],
     answer:
-      "To place an order, select your preferred fashion item, add it to cart, proceed to checkout, enter your delivery details and choose your payment method.",
+      "You can browse the collection and click Add to cart to try the shopping interface. This demonstration does not have a live checkout or take payments. For a real order, please use the shop's verified channel.",
   },
   {
     intent: "tracking",
@@ -228,7 +228,7 @@ const knowledgeBase = [
     intent: "business_hours",
     keywords: ["opening", "closing", "business hours", "working hours", "open today", "what time"],
     answer:
-      "Our customer support service is available Monday to Saturday from 9:00 AM to 6:00 PM. Messages received outside these hours will be answered on the next working day.",
+      "The sample support hours shown here are Monday to Saturday, 9:00 AM to 6:00 PM. These are demonstration details; verify the shop's current hours before visiting or contacting it.",
   },
   {
     intent: "price",
@@ -246,7 +246,7 @@ const knowledgeBase = [
     intent: "quality",
     keywords: ["original", "quality", "fabric", "material", "authentic", "genuine"],
     answer:
-      "Shemar Collection sells carefully selected, quality women’s fashion. Fabric and material details are provided for each item, and customer support can share more photos on request.",
+      "Material, fabric and care details can vary between garments. This demonstration does not verify product composition, so ask the shop for the exact fabric, close-up photographs and care label before ordering.",
   },
   {
     intent: "care_instructions",
@@ -268,7 +268,7 @@ const knowledgeBase = [
   },
   {
     intent: "new_arrivals",
-    keywords: ["new arrivals", "new arrival", "new collection", "latest", "restock", "new items"],
+    keywords: ["new arrivals", "new arrival", "new collection", "latest", "restock", "new items", "whats new", "what is new"],
     answer:
       "New arrivals are added regularly. Check the Products section for the latest items, or ask customer support about restocks of a particular item.",
   },
@@ -276,13 +276,13 @@ const knowledgeBase = [
     intent: "wholesale",
     keywords: ["wholesale", "bulk", "reseller", "resell", "large order"],
     answer:
-      "We accept bulk and wholesale orders. Contact customer support with the items and quantities you need for a price quote.",
+      "For a bulk order, tell the shop which items and quantities you need and request a quotation. Wholesale availability and pricing are not confirmed by this demonstration.",
   },
   {
     intent: "gift",
     keywords: ["gift", "gifts", "gift wrap", "gift wrapping", "wrapping", "present", "voucher"],
     answer:
-      "Gift wrapping is available on request. Add a note at checkout or tell customer support, and we can also include a personal message with the order.",
+      "Gift wrapping and a personal message can be requested from the shop, subject to confirmation. This demonstration has no live gift-order checkout.",
   },
   {
     intent: "products",
@@ -335,9 +335,10 @@ const knowledgeBase = [
   { intent: "gift_delivery", keywords: ["send as a gift", "send to someone", "gift for someone", "deliver a gift"], answer: "A gift order would need the recipient's delivery arrangements confirmed by the shop. Gift wrapping is shown as a sample service, not a confirmed live order option." },
   { intent: "returns_eligibility", keywords: ["return after", "refund timeline", "return window", "how many days to return"], answer: "The demonstration FAQ refers to contacting support within 24 hours of delivery for an issue. Actual return eligibility and refund timing must be confirmed against the shop's current policies." },
   { intent: "store_pickup", keywords: ["can i collect", "pick up", "pickup", "collect in person", "self collection"], answer: "Collection arrangements depend on whether the shop has an active pickup location. This demo has no verified collection address, so confirm arrangements directly before travelling." },
-  { intent: "delivery_address", keywords: ["change delivery address", "wrong address", "update my address", "delivery address change"], answer: "If you need to change an address, contact the shop with your order reference before dispatch. This demo does not update real orders or addresses." },
-  { intent: "privacy", keywords: ["is this secure", "is my information safe", "privacy", "personal information", "card details", "is my data saved"], answer: "This chat is a browser-only demonstration. Conversation records are saved locally in this browser for the demo administrator view. Do not enter private account details, payment information or passwords." },
+  { intent: "delivery_address", keywords: ["change delivery address", "change my delivery address", "wrong address", "update my address", "delivery address change"], answer: "If you need to change an address, contact the shop with your order reference before dispatch. This demo does not update real orders or addresses." },
+  { intent: "privacy", keywords: ["is this secure", "is my information safe", "privacy", "personal information", "card details", "is my data saved", "what do you store", "what data do you store", "demo store", "information does this demo store"], answer: "This chat is a browser-only demonstration. Conversation records are saved locally in this browser for the demo administrator view. Do not enter private account details, payment information or passwords." },
   { intent: "preorder", keywords: ["preorder", "pre order", "reserve an item", "out of stock"], answer: "This sample catalogue is not linked to stock or reservations. A real preorder can only be confirmed by the shop through its official contact channel." },
+  { intent: "size_exchange", keywords: ["exchange my size", "exchange for another size", "swap for another size", "different size", "wrong size"], answer: "If a size does not fit, ask the shop about exchanging it before returning the garment. Keep the item in suitable condition and check the return requirements. This demo cannot open a real exchange request." },
   { intent: "order_number", keywords: ["where do i find my order number", "lost my order number", "order reference", "order id"], answer: "A real order reference is usually in an order confirmation message or receipt. This demo does not generate order numbers or retrieve purchases. Please ask the shop if you cannot find yours." },
 ];
 
