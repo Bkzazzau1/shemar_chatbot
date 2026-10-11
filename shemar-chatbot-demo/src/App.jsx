@@ -683,6 +683,8 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
   const [showSamples, setShowSamples] = useState(false);
   const [rated, setRated] = useState([]);
   const [escalated, setEscalated] = useState([]);
+  const lastMessage = messages[messages.length - 1];
+  const latestReply = !typing && lastMessage?.sender === "bot" && lastMessage.recordId ? lastMessage : null;
   const messagesEndRef = useRef(null);
 
   const sampleMessages = [
@@ -807,26 +809,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                       Intent: {item.intent}
                     </p>
                   )}
-                  {item.recordId && (
-                    <div className="mt-2 flex flex-wrap gap-2 border-t border-[#D4AF37]/20 pt-2">
-                      {["Helpful", "Not helpful"].map((rating) => (
-                        <button key={rating} disabled={rated.includes(item.recordId)}
-                          onClick={() => {
-                            onFeedback({ id: demoRecordId(), conversationId: item.recordId, question: item.question, rating, createdAt: new Date().toISOString() });
-                            setRated((list) => [...list, item.recordId]);
-                          }}
-                          className="rounded-md border border-[#D4AF37]/30 px-2 py-1 text-[10px] text-[#D4AF37] disabled:opacity-30">{rating}</button>
-                      ))}
-                      <button disabled={escalated.includes(item.recordId)}
-                        onClick={() => {
-                          onEscalation({ id: demoRecordId(), conversationId: item.recordId, question: item.question, status: "Pending", createdAt: new Date().toISOString() });
-                          setEscalated((list) => [...list, item.recordId]);
-                        }}
-                        className="rounded-md border border-white/20 px-2 py-1 text-[10px] text-white disabled:opacity-30">
-                        {escalated.includes(item.recordId) ? "Support requested" : "Request human support"}
-                      </button>
-                    </div>
-                  )}
+
                 </div>
               </div>
             ))}
@@ -842,6 +825,48 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                     />
                   ))}
                   <span className="ml-2 text-xs text-neutral-400">Assistant is typing</span>
+                </div>
+              </div>
+            )}
+
+            {latestReply && (
+              <div className="space-y-3 rounded-2xl border border-[#D4AF37]/25 bg-[#1A1813] p-3.5" aria-label="Conversation options">
+                <p className="text-[11px] font-semibold tracking-wide text-[#D4AF37]">You can also ask</p>
+                <div className="flex flex-wrap gap-2">
+                  {(latestReply.suggestions || []).slice(0, 3).map((suggestion) => (
+                    <button type="button" key={suggestion} disabled={typing} onClick={() => sendMessage(suggestion)}
+                      className="rounded-full border border-[#D4AF37]/25 bg-[#D4AF37]/[0.06] px-3 py-2 text-left text-[11px] leading-4 text-[#F2E5C2] transition hover:border-[#D4AF37]/60 hover:bg-[#D4AF37]/15">
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+                <div className="border-t border-[#D4AF37]/20 pt-3">
+                  <p className="mb-2 text-[11px] text-[#B6AD96]">
+                    {rated.includes(latestReply.recordId) ? "Thank you for your feedback!" : "Was this conversation helpful?"}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {!rated.includes(latestReply.recordId) && ["Helpful", "Not helpful"].map((rating) => (
+                      <button key={rating} type="button"
+                        onClick={() => {
+                          onFeedback({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, rating, createdAt: new Date().toISOString() });
+                          setRated((current) => [...current, latestReply.recordId]);
+                        }}
+                        className="rounded-lg border border-[#D4AF37]/40 px-3 py-2 text-[11px] text-[#ECD28A] transition hover:bg-[#D4AF37]/15">
+                        {rating === "Helpful" ? "👍 Helpful" : "👎 Not helpful"}
+                      </button>
+                    ))}
+                    <button type="button" disabled={escalated.includes(latestReply.recordId)}
+                      onClick={() => {
+                        onEscalation({ id: demoRecordId(), conversationId: latestReply.recordId, question: latestReply.question, intent: latestReply.intent, status: "Pending", createdAt: new Date().toISOString() });
+                        setEscalated((current) => [...current, latestReply.recordId]);
+                      }}
+                      className="rounded-lg border border-white/25 px-3 py-2 text-[11px] font-medium text-[#F3F0E7] transition hover:border-[#D4AF37]/60 disabled:cursor-default disabled:opacity-60">
+                      {escalated.includes(latestReply.recordId) ? "Demo request recorded" : "Request human support"}
+                    </button>
+                  </div>
+                  {escalated.includes(latestReply.recordId) && (
+                    <p className="mt-2 text-[10px] leading-4 text-[#AFA996]">Saved in the demo dashboard only. No real support agent has been contacted.</p>
+                  )}
                 </div>
               </div>
             )}
