@@ -341,7 +341,7 @@ function detectIntent(message, faqs) {
   return best || { intent: "unknown", answer: "I could not match that enquiry. Please rephrase it or request human support." };
 }
 
-function Header({ cartCount, page }) {
+function Header({ cartCount, page, onTryChatbot }) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -369,9 +369,9 @@ function Header({ cartCount, page }) {
           <a href="#products" className="hover:text-[#D4AF37]">
             Products
           </a>
-          <a href="#support" className="hover:text-[#D4AF37]">
+          <button type="button" onClick={onTryChatbot} className="hover:text-[#D4AF37]">
             Support
-          </a>
+          </button>
           <a href="#admin" className={page === "admin" ? "text-[#D4AF37]" : "hover:text-[#D4AF37]"}>
             Admin Demo
           </a>
@@ -399,7 +399,7 @@ function Header({ cartCount, page }) {
           <div className="flex flex-col gap-3 text-sm font-medium text-neutral-300">
             <a href="#home" onClick={() => setOpen(false)}>Home</a>
             <a href="#products" onClick={() => setOpen(false)}>Products</a>
-            <a href="#support" onClick={() => setOpen(false)}>Support</a>
+            <button type="button" className="text-left" onClick={() => { setOpen(false); onTryChatbot(); }}>Support</button>
             <a href="#admin" onClick={() => setOpen(false)}>Admin Demo</a>
           </div>
         </div>
@@ -1058,7 +1058,7 @@ export default function ShemarCollectionChatbotDemo() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <Header cartCount={cartCount} page={page} />
+      <Header cartCount={cartCount} page={page} onTryChatbot={() => setChatOpen(true)} />
       {page === "admin" ? (
         <AdminPreview demo={demo} saveFaq={saveFaq}
           deleteFaq={(id) => setDemo((state) => ({ ...state, faqs: state.faqs.filter((v) => v.id !== id) }))}
