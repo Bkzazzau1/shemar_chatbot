@@ -12,7 +12,7 @@ const extraPhrases = {
   return_policy: ["item does not fit", "doesnt fit", "return an item", "return my item", "exchange an item", "return policy"],
   wrong_item: ["wrong item", "incorrect item", "wrong colour sent", "wrong size sent", "sent the wrong"],
   damaged_item: ["arrived damaged", "damaged package", "item is damaged", "torn dress", "broken item", "defective product"],
-  stock_availability: ["do you have", "is it in stock", "is it available", "still in stock", "available in medium", "in stock"],
+  stock_availability: ["is it in stock", "is it available", "still in stock", "available in medium", "in stock"],
   size_guide: ["which size", "what size", "size chart", "will this fit", "measurement chart", "size guide"],
   price: ["how much is the", "how much does the", "price of", "cost of the", "what does it cost", "price for"],
   order: ["how to order", "place an order", "buy online", "how do i buy", "checkout"],
