@@ -1,8 +1,105 @@
-html {
-  scroll-behavior: smooth;
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap");
+
+:root {
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
 }
 
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 94px; }
 body {
   margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
+  background: #080807;
+  color: #f5f0e8;
+  font-family: "DM Sans", Arial, Helvetica, sans-serif;
+}
+button, input, select, textarea { font: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; }
+a, button, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid #dfc06b; outline-offset: 3px; }
+::selection { background: #d4af37; color: #110f0a; }
+
+.shemar-display {
+  font-family: "Playfair Display", Georgia, "Times New Roman", serif;
+  letter-spacing: -0.035em;
+}
+.shemar-header {
+  background: rgba(10, 9, 8, .92);
+  box-shadow: 0 12px 45px rgba(0,0,0,.22);
+}
+.shemar-header nav a {
+  position: relative;
+  transition: color .2s ease;
+}
+.shemar-header nav a::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 1px;
+  background: #d4af37;
+  bottom: -8px;
+  left: 0;
+  transition: width .25s ease;
+}
+.shemar-header nav a:hover::after { width: 100%; }
+
+.shemar-products {
+  background-image: radial-gradient(circle at 93% 7%, rgba(212,175,55,.075), transparent 32%);
+}
+.shemar-filters {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212,175,55,.4) transparent;
+}
+.shemar-filters::-webkit-scrollbar { height: 4px; }
+.shemar-filters::-webkit-scrollbar-thumb { background: rgba(212,175,55,.4); border-radius: 8px; }
+.shemar-product-card {
+  background: linear-gradient(145deg, #1b1915, #11100e 90%);
+  isolation: isolate;
+}
+.shemar-product-image { background: #1b1814; }
+.shemar-product-placeholder {
+  position: relative;
+  background:
+    radial-gradient(circle at 49% 47%, rgba(212,175,55,.12), transparent 40%),
+    linear-gradient(145deg, #282116 0%, #151310 75%);
+}
+.shemar-product-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 13px;
+  border: 1px solid rgba(212,175,55,.15);
+  border-radius: 13px;
+  pointer-events: none;
+}
+
+.shemar-chat-shell {
+  width: min(430px, calc(100vw - 24px));
+  height: min(620px, calc(100dvh - 54px));
+  min-height: min(390px, calc(100dvh - 54px));
+  background: #110f0d;
+}
+.shemar-chat-messages {
+  scrollbar-width: thin;
+  scrollbar-color: #6f5c2b #16130f;
+  overscroll-behavior: contain;
+}
+.shemar-chat-messages::-webkit-scrollbar { width: 6px; }
+.shemar-chat-messages::-webkit-scrollbar-thumb { background: #6f5c2b; border-radius: 10px; }
+.shemar-chat-launch { letter-spacing: .01em; }
+
+@media (max-width: 640px) {
+  html { scroll-padding-top: 80px; }
+  .shemar-chat-shell { 
+    width: calc(100vw - 24px);
+    height: min(610px, calc(100dvh - 30px));
+    max-height: calc(100dvh - 30px);
+    border-radius: 22px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
