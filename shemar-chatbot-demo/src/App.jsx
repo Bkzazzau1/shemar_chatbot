@@ -345,8 +345,8 @@ function Header({ cartCount, page }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-black/90 text-white backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
+    <header className="shemar-header sticky top-0 z-40 border-b border-[#D4AF37]/20 bg-black/90 text-white backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] shadow-lg shadow-[#D4AF37]/10">
             <Crown size={23} />
@@ -357,7 +357,7 @@ function Header({ cartCount, page }) {
               Shemar Collection
             </h1>
             <p className="text-xs text-[#D4AF37]">
-              Women Fashion • Luxury Style • Support
+              Premium fashion • Thoughtful service
             </p>
           </div>
         </div>
@@ -378,8 +378,8 @@ function Header({ cartCount, page }) {
         </nav>
 
         <Button
-          onClick={() => { if (page === "admin") window.location.hash = "#products"; else document.querySelector("#products")?.scrollIntoView(); }}
-          className="hidden items-center gap-2 rounded-2xl bg-[#D4AF37] px-5 text-black hover:bg-[#f0cc5a] md:inline-flex"
+          onClick={() => { if (page === "admin") window.location.hash = "#products"; else document.querySelector("#products")?.scrollIntoView({ behavior: "smooth" }); }}
+          className="hidden items-center gap-2 rounded-full bg-[#D4AF37] px-5 text-black shadow-lg shadow-[#D4AF37]/10 transition hover:bg-[#f0cc5a] md:inline-flex"
         >
           <ShoppingCart size={17} /> Shop Premium
           {cartCount > 0 && (
@@ -389,7 +389,7 @@ function Header({ cartCount, page }) {
           )}
         </Button>
 
-        <button className="md:hidden" onClick={() => setOpen(!open)}>
+        <button aria-label={open ? "Close navigation" : "Open navigation"} aria-expanded={open} className="rounded-xl border border-[#D4AF37]/25 p-2 text-[#D4AF37] md:hidden" onClick={() => setOpen(!open)}>
           {open ? <X /> : <Menu />}
         </button>
       </div>
@@ -397,10 +397,10 @@ function Header({ cartCount, page }) {
       {open && (
         <div className="border-t border-[#D4AF37]/20 bg-black px-4 py-4 md:hidden">
           <div className="flex flex-col gap-3 text-sm font-medium text-neutral-300">
-            <a href="#home">Home</a>
-            <a href="#products">Products</a>
-            <a href="#support">Support</a>
-            <a href="#admin">Admin Demo</a>
+            <a href="#home" onClick={() => setOpen(false)}>Home</a>
+            <a href="#products" onClick={() => setOpen(false)}>Products</a>
+            <a href="#support" onClick={() => setOpen(false)}>Support</a>
+            <a href="#admin" onClick={() => setOpen(false)}>Admin Demo</a>
           </div>
         </div>
       )}
@@ -414,7 +414,7 @@ function Hero({ onTryChatbot, onAddToCart }) {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,#D4AF3725,transparent_35%),radial-gradient(circle_at_bottom_left,#ffffff12,transparent_35%)]" />
       <div className="absolute left-0 top-0 h-full w-full bg-[linear-gradient(135deg,rgba(212,175,55,0.08),transparent,rgba(212,175,55,0.05))]" />
 
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-20 md:grid-cols-2 md:items-center">
+      <div className="relative mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 md:items-center md:py-24">
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
@@ -425,15 +425,12 @@ function Hero({ onTryChatbot, onAddToCart }) {
             Customer Service Chatbot Demonstration
           </p>
 
-          <h2 className="max-w-2xl text-4xl font-black leading-tight tracking-tight md:text-6xl">
-            Premium women’s fashion with an interactive support demonstration.
+          <h2 className="shemar-display max-w-2xl text-5xl font-medium leading-[1.08] tracking-tight text-[#FBF5E9] sm:text-6xl lg:text-7xl">
+            A little luxury. <span className="text-[#D4AF37]">Every day.</span>
           </h2>
 
           <p className="mt-6 max-w-xl text-base leading-8 text-neutral-300">
-            Shemar Collection is a luxury women’s fashion e-commerce demo used
-            to showcase a browser-based customer service chatbot. Customers can ask
-            about dresses, scarves, bags, abayas, delivery, payment, returns and
-            order support while shopping online.
+            Explore a thoughtfully curated collection of women’s fashion. Browse the pieces you love and experience our interactive customer support demonstration for delivery, payments, returns and more.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -743,30 +740,30 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
   }, [messages, typing, open]);
 
   return (
-    <div id="support" className="fixed bottom-5 right-5 z-50">
+    <div id="support" className="fixed bottom-4 right-3 z-50 sm:bottom-6 sm:right-6">
       {open && (
         <motion.div
           initial={{ opacity: 0, y: 20, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="mb-2 flex max-h-[calc(100vh-2rem)] w-[calc(100vw-1.5rem)] max-w-sm flex-col overflow-hidden rounded-[1.7rem] border border-[#D4AF37]/30 bg-black shadow-2xl shadow-[#D4AF37]/20 sm:mb-4 sm:max-h-[calc(100vh-3rem)] sm:w-[92vw]"
+          className="shemar-chat-shell flex flex-col overflow-hidden rounded-[1.6rem] border border-[#D4AF37]/40 bg-[#10100E] text-white shadow-[0_28px_90px_rgba(0,0,0,.65)]"
         >
-          <div className="flex items-center justify-between bg-[#090909] px-5 py-4 text-white">
+          <div className="flex items-center justify-between border-b border-[#D4AF37]/20 bg-[#181611] px-4 py-4 text-white sm:px-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#D4AF37] text-black">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#D4AF37] text-black shadow-md shadow-[#D4AF37]/10">
                 <Bot size={21} />
               </div>
 
               <div>
-                <h3 className="font-bold">Customer Support Demo</h3>
+                <h3 className="font-bold">Shemar Concierge</h3>
                 <p className="text-xs text-[#D4AF37]">
-                  Keyword-based intent matching
+                  Customer assistance · Demo
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
               <button
-                onClick={() => setMessages([welcomeMessage])}
+                onClick={() => { setMessages([welcomeMessage]); setRated([]); setEscalated([]); }}
                 className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-[#D4AF37]"
                 aria-label="Clear conversation"
                 title="Clear conversation"
@@ -783,7 +780,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
             </div>
           </div>
 
-          <div className="min-h-40 flex-1 space-y-3 overflow-y-auto bg-[#111111] p-4 sm:h-72 sm:flex-none">
+          <div className="shemar-chat-messages min-h-0 flex-1 space-y-4 overflow-y-auto bg-[#100F0D] p-4 sm:p-5">
             {messages.map((item, index) => (
               <div
                 key={index}
@@ -795,7 +792,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                   className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-6 ${
                     item.sender === "user"
                       ? "bg-[#D4AF37] text-black"
-                      : "border border-[#D4AF37]/20 bg-black text-neutral-200"
+                      : "border border-[#D4AF37]/20 bg-[#211F1A] text-[#F0EDE7]"
                   }`}
                 >
                   <p>{item.text}</p>
@@ -846,10 +843,10 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="border-t border-[#D4AF37]/20 bg-black p-3">
+          <div className="border-t border-[#D4AF37]/20 bg-[#171510] p-3.5 sm:p-4">
             <button
               onClick={() => setShowSamples((value) => !value)}
-              className="mb-2 flex w-full items-center justify-between text-xs text-neutral-400 hover:text-[#D4AF37]"
+              className="mb-3 flex w-full items-center justify-between text-xs text-[#D7C8A3] hover:text-[#D4AF37]"
             >
               Try a sample question
               <ChevronDown
@@ -858,7 +855,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
               />
             </button>
             {showSamples && (
-              <div className="mb-3 grid max-h-28 gap-2 overflow-y-auto sm:grid-cols-2">
+              <div className="mb-3 grid max-h-36 gap-2 overflow-y-auto sm:grid-cols-2">
                 {sampleMessages.map((sample) => (
                   <button
                     key={sample}
@@ -871,12 +868,12 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                 ))}
               </div>
             )}
-            <div className="flex items-center gap-2 rounded-2xl border border-[#D4AF37]/30 bg-[#111111] px-3 py-2">
+            <div className="flex items-center gap-2 rounded-2xl border border-[#D4AF37]/30 bg-[#0B0A09] px-3 py-2.5 focus-within:border-[#D4AF37]">
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-                placeholder="Type your question..."
+                placeholder="How can we help you?"
                 className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-neutral-500"
               />
 
@@ -884,7 +881,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                 onClick={sendMessage}
                 disabled={typing}
                 size="icon"
-                className="rounded-xl bg-[#D4AF37] text-black"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#D4AF37] text-black transition hover:bg-[#F0D681]"
               >
                 <Send size={17} />
               </Button>
@@ -896,9 +893,9 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
       {!open && (
         <Button
           onClick={() => setOpen(true)}
-          className="h-14 rounded-full bg-[#D4AF37] px-5 text-black shadow-2xl shadow-[#D4AF37]/20 hover:bg-[#f0cc5a]"
+          className="shemar-chat-launch flex h-14 items-center gap-2 rounded-full border border-[#F5DA81]/40 bg-[#D4AF37] px-5 text-sm font-semibold text-black shadow-[0_10px_35px_rgba(212,175,55,.25)] transition hover:-translate-y-1 hover:bg-[#F1D780]"
         >
-          <MessageCircle className="mr-2" size={20} /> Chat Support
+          <MessageCircle size={20} /> Chat with us
         </Button>
       )}
     </div>
@@ -1034,7 +1031,7 @@ function HowItWorks() {
 
 export default function ShemarCollectionChatbotDemo() {
   const [cartCount, setCartCount] = useState(0);
-  const [chatOpen, setChatOpen] = useState(true);
+  const [chatOpen, setChatOpen] = useState(false);
   const [cartNotice, setCartNotice] = useState("");
   const [demo, setDemo] = useState(() => loadDemoState(knowledgeBase));
   const [page, setPage] = useState(() => (window.location.hash === "#admin" ? "admin" : "store"));
@@ -1078,8 +1075,7 @@ export default function ShemarCollectionChatbotDemo() {
 
       <footer className="border-t border-[#D4AF37]/20 bg-black px-4 py-10 text-center text-sm text-neutral-500">
         <p>
-          © 2026 Shemar Collection. Premium women’s fashion e-commerce demo for
-          Keyword-based customer support demonstration. No real backend or deployed NLP model.
+          © 2026 Shemar Collection. Demonstration catalogue and browser-local customer support; no real backend or deployed NLP model.
         </p>
       </footer>
 
