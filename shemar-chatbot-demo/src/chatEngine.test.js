@@ -25,6 +25,17 @@ const faqs = [
   { intent: "privacy", keywords: ["demo store", "privacy"], answer: "Only browser-local demo storage." },
   { intent: "delivery_address", keywords: ["change my delivery address"], answer: "Ask about changing address." },
   { intent: "thanks", keywords: ["thank", "thanks", "bye"], answer: "You're welcome!" },
+  { intent: "late_delivery", keywords: ["order is late", "delivery is delayed", "delayed", "havent received my order"], answer: "Ask the shop to check with the courier." },
+  { intent: "missing_item", keywords: ["missing item", "missing from my order"], answer: "Report the missing item." },
+  { intent: "order_confirmation", keywords: ["did my order go through", "order confirmation"], answer: "The shop confirms real orders." },
+  { intent: "refund_status", keywords: ["my refund", "where is my refund"], answer: "The shop must confirm refunds." },
+  { intent: "installment", keywords: ["instalments", "installments", "pay in instalments"], answer: "Ask about part payment." },
+  { intent: "price_negotiation", keywords: ["last price", "is the price negotiable"], answer: "Catalogue prices are fixed." },
+  { intent: "plus_size", keywords: ["plus size", "xl"], answer: "Send your measurements." },
+  { intent: "modest_wear", keywords: ["modest wear", "sell hijab", "hijab"], answer: "See our abayas and kaftans." },
+  { intent: "styling_advice", keywords: ["what goes with", "recommend"], answer: "Pair the dress with gold jewelry." },
+  { intent: "jewelry", keywords: ["jewelry", "sell earrings", "earrings"], answer: "Fashion jewelry is available." },
+  { intent: "holiday_hours", keywords: ["sunday", "public holiday", "sallah"], answer: "Support is closed on Sundays." },
 ];
 
 const cases = [
@@ -45,6 +56,20 @@ const cases = [
   ["Do you have a size guide?", "size_guide"],
   ["I need something different from this", "unknown"],
   ["Thanks so much!", "thanks"],
+  ["My order is late", "late_delivery"],
+  ["My delivery is delayed", "late_delivery"],
+  ["I haven't received my order", "late_delivery"],
+  ["One item is missing from my order", "missing_item"],
+  ["Did my order go through?", "order_confirmation"],
+  ["Where is my refund?", "refund_status"],
+  ["Can I pay in instalments?", "installment"],
+  ["What is your last price?", "price_negotiation"],
+  ["Is the price negotiable?", "price_negotiation"],
+  ["Do you have plus size dresses?", "plus_size"],
+  ["Do you sell hijab?", "modest_wear"],
+  ["What goes with the black dress?", "styling_advice"],
+  ["Do you sell earrings?", "jewelry"],
+  ["Are you open on Sunday?", "holiday_hours"],
 ];
 
 for (const [question, expected] of cases) {
@@ -65,6 +90,14 @@ test("catalogue price is specific and based on supplied sample products", () => 
   ]);
   assert.match(answer.answer, /₦45,000/);
   assert.match(answer.answer, /demo catalogue/);
+});
+
+test("jewelry price comes from the supplied catalogue", () => {
+  const answer = answerCustomer("How much is the jewelry set?", faqs, {}, [
+    { name: "Gold Fashion Jewelry Set", price: "₦25,000" },
+  ]);
+  assert.equal(answer.intent, "price");
+  assert.match(answer.answer, /₦25,000/);
 });
 
 test("updated demo FAQ answer overrides the seed answer", () => {

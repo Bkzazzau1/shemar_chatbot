@@ -47,6 +47,17 @@ const followUps = {
   account_access: ["Can I speak to a person?", "How do I protect my account?"],
   gift: ["Do you offer gift wrapping?", "Can you deliver to someone else?"],
   thanks: ["What products do you sell?", "How do I order?"],
+  late_delivery: ["How do I track my order?", "Can I speak to a person?"],
+  missing_item: ["How do I contact support?", "What is your return policy?"],
+  order_confirmation: ["How do I confirm my payment?", "How do I track my order?"],
+  refund_status: ["What is your return policy?", "Can I speak to a person?"],
+  installment: ["Can I pay on delivery?", "How can I pay?"],
+  price_negotiation: ["Do you have discounts?", "Do you sell wholesale?"],
+  plus_size: ["Do you have a size guide?", "Do you make custom outfits?"],
+  modest_wear: ["How much is the abaya?", "What goes with the black dress?"],
+  styling_advice: ["How much is the jewelry set?", "Do you have outfits for weddings?"],
+  jewelry: ["How much is the jewelry set?", "What goes with the black dress?"],
+  holiday_hours: ["What are your business hours?", "How long does delivery take?"],
   unknown: ["Do you deliver to Kaduna?", "How do I track my order?", "What is your return policy?"],
 };
 
@@ -95,6 +106,7 @@ function cataloguePrice(text, catalogue) {
     [/\bkaftan\b/, "Royal Ladies Kaftan"],
     [/\babaya\b/, "Classy Women Abaya Set"],
     [/\bankara|gown\b/, "Premium Ankara Gown"],
+    [/\bjewell?e?ry|necklace|earrings?\b/, "Gold Fashion Jewelry Set"],
   ];
   for (const [pattern, name] of aliases) {
     if (!pattern.test(text)) continue;

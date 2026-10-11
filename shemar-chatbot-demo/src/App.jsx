@@ -340,6 +340,20 @@ const knowledgeBase = [
   { intent: "preorder", keywords: ["preorder", "pre order", "reserve an item", "out of stock"], answer: "This sample catalogue is not linked to stock or reservations. A real preorder can only be confirmed by the shop through its official contact channel." },
   { intent: "size_exchange", keywords: ["exchange my size", "exchange for another size", "swap for another size", "different size", "wrong size"], answer: "If a size does not fit, ask the shop about exchanging it before returning the garment. Keep the item in suitable condition and check the return requirements. This demo cannot open a real exchange request." },
   { intent: "order_number", keywords: ["where do i find my order number", "lost my order number", "order reference", "order id"], answer: "A real order reference is usually in an order confirmation message or receipt. This demo does not generate order numbers or retrieve purchases. Please ask the shop if you cannot find yours." },
+  { intent: "late_delivery", keywords: ["order is late", "delivery is late", "delivery is delayed", "order is delayed", "delayed", "delay", "not delivered", "hasnt arrived", "has not arrived", "still waiting", "havent received my order"], answer: "Sorry your order is taking longer than expected. Courier delays can happen, especially for interstate deliveries. Contact the shop with your order reference so they can check with the courier. This demo cannot see real deliveries." },
+  { intent: "missing_item", keywords: ["missing item", "item missing", "is missing", "missing from my order", "incomplete order", "not everything arrived", "part of my order"], answer: "If part of your order is missing, check whether it was sent in separate packages, then contact the shop with your order reference and a photo of what you received. The shop can confirm and send the missing item." },
+  { intent: "order_confirmation", keywords: ["did my order go through", "order confirmation", "confirm my order", "is my order confirmed", "confirmation email", "confirmation message", "didnt get a confirmation"], answer: "A real order is confirmed by the shop after payment, usually by message or email. This demo does not create real orders, so no confirmation will be sent." },
+  { intent: "refund_status", keywords: ["my refund", "where is my refund", "refund status", "when will i get my refund", "refund not received", "how long does a refund take"], answer: "Once a return is approved, refunds are usually sent back through the original payment method. Bank transfers can take a few working days to reflect. The shop must confirm the status of a real refund." },
+  { intent: "installment", keywords: ["installment", "installments", "instalment", "instalments", "pay in parts", "part payment", "pay in instalments", "pay in installments", "pay small small", "layaway"], answer: "Part payment or instalments would need to be agreed with the shop before ordering. This demo does not process payments, so please ask customer support whether it is available for the item you want." },
+  { intent: "price_negotiation", keywords: ["last price", "final price", "price negotiable", "is the price negotiable", "reduce the price", "negotiate", "negotiable", "best price", "can you reduce"], answer: "Prices in the catalogue are fixed sample prices. For bulk orders or during promotions the shop may offer a better price, so ask customer support about current offers." },
+  { intent: "plus_size", keywords: ["plus size", "plus sizes", "big size", "bigger size", "curvy", "petite", "xl", "xxl", "3xl", "small size"], answer: "Shemar Collection aims to offer styles for a range of body types. Send your bust, waist and hip measurements to customer support and they can confirm which sizes or alterations are available." },
+  { intent: "modest_wear", keywords: ["modest", "modest wear", "modest dresses", "sell hijab", "sell hijabs", "hijab", "long sleeve", "long sleeves", "covered", "islamic wear", "jilbab"], answer: "For modest styles, see our abaya sets, kaftans and Ankara gowns, which come in longer lengths with fuller coverage. Customer support can suggest matching scarves." },
+  { intent: "styling_advice", keywords: ["what goes with", "match with", "matches with", "styling", "style me", "outfit idea", "outfit ideas", "what should i wear", "recommend", "suggest"], answer: "A simple luxury look pairs the black evening dress with the gold jewelry set and luxury heels. For a modest look, try an abaya set with the gold silk scarf and the elegant handbag." },
+  { intent: "jewelry", keywords: ["jewelry", "jewellery", "sell jewelry", "sell jewellery", "sell earrings", "sell necklaces", "necklace", "earrings", "bracelet", "gold set"], answer: "Our gold fashion jewelry set includes pieces that pair well with evening dresses and gowns. It is fashion jewelry, not solid gold. Ask customer support for exact pieces and finish." },
+  { intent: "holiday_hours", keywords: ["sunday", "sundays", "public holiday", "holiday", "holidays", "weekend", "christmas", "sallah", "eid"], answer: "Customer support is usually closed on Sundays and some public holidays. Messages received then are answered on the next working day, and deliveries may take longer around festive periods." },
+  { intent: "loyalty", keywords: ["loyalty", "reward", "rewards", "points", "vip", "membership", "returning customer"], answer: "This demo has no loyalty or rewards programme. A real shop may offer special deals to returning customers, so ask customer support about current offers." },
+  { intent: "social_media", keywords: ["instagram", "facebook", "tiktok", "twitter", "social media", "follow you", "newsletter"], answer: "Shemar Collection shares new arrivals and promotions on social media. Use only the shop's verified pages, and never send payment to an account you cannot verify." },
+  { intent: "leave_review", keywords: ["leave a review", "write a review", "give feedback", "reviews", "testimonial"], answer: "Thank you for wanting to share your experience! Use the rating buttons under my answers, or contact customer support to leave a review of your order." },
 ];
 
 
@@ -716,6 +730,17 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     "What are your business hours?",
     "What information does this demo store?",
     "Can I speak to a person?",
+    "My order is late",
+    "One item is missing from my order",
+    "Where is my refund?",
+    "Can I pay in instalments?",
+    "What is your last price?",
+    "Do you have plus size dresses?",
+    "Do you have modest wear?",
+    "What goes with the black dress?",
+    "How much is the jewelry set?",
+    "Are you open on Sunday?",
+    "Are you on Instagram?",
   ];
 
   const sendMessage = (sampleMessage) => {
