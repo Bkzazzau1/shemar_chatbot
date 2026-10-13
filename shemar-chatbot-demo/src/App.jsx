@@ -27,6 +27,7 @@ import handbagImage from "./assets/product-handbag.png";
 import heelsImage from "./assets/product-heels.png";
 import { initialDemoState, loadDemoState, saveDemoState, demoRecordId } from "./demoBackend.js";
 import { answerCustomer } from "./chatEngine.js";
+import { answerWithGemini } from "./geminiSession.js";
 
 function Button({ children, className = "", size, variant, ...props }) {
   return (
@@ -687,7 +688,7 @@ function Products({ onAddToCart }) {
 
 const welcomeMessage = {
   sender: "bot",
-  text: "Hello! Welcome to Shemar Collection. Looking for a style, checking delivery, or need help with an order? Tell me what you need, or choose a question below. This is a shop demonstration, not a live order service.",
+  text: "Hello! Welcome to Shemar Collection. Looking for a style, checking delivery, or need help with an order? Tell me what you need, or choose a question below.",
   intent: "greeting",
 };
 
@@ -699,6 +700,23 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
   const [rated, setRated] = useState([]);
   const [escalated, setEscalated] = useState([]);
   const [conversationFinished, setConversationFinished] = useState(false);
+  const geminiKeyRef = useRef("");
+
+  useEffect(() => {
+    const connect = (event) => {
+      if (event.ctrlKey && event.altKey && event.code === "KeyG" && !event.repeat) {
+        event.preventDefault();
+        const key = window.prompt("Gemini API key (leave blank to disconnect):");
+        if (key !== null) geminiKeyRef.current = key.trim();
+      }
+    };
+    window.addEventListener("keydown", connect);
+    return () => {
+      window.removeEventListener("keydown", connect);
+      geminiKeyRef.current = "";
+    };
+  }, []);
+
   const lastMessage = messages[messages.length - 1];
   const latestReply = !typing && lastMessage?.sender === "bot" && lastMessage.recordId ? lastMessage : null;
   const messagesEndRef = useRef(null);
@@ -743,31 +761,60 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
     "Are you on Instagram?",
   ];
 
-  const sendMessage = (sampleMessage) => {
+
+  const sendMessage = async (sampleMessage) => {
+    if (typing) return;
     const cleanMessage = (
       typeof sampleMessage === "string" ? sampleMessage : message
     ).trim();
     if (!cleanMessage) return;
 
-    const userMessage = { sender: "user", text: cleanMessage };
-    const previousReply = [...messages].reverse().find((item) => item.sender === "bot" && item.recordId);
-    const result = answerCustomer(cleanMessage, faqs, { lastIntent: previousReply?.intent }, products);
-    if (!result) return;
+    const previousReply = [...messages].reverse().find(
+      (item) => item.sender === "bot" && item.recordId
+    );
+    const prepared = answerCustomer(
+      cleanMessage, faqs, { lastIntent: previousReply?.intent }, products
+    );
+    if (!prepared) return;
+
     const recordId = demoRecordId();
-    setMessages((prev) => [...prev, userMessage]);
+    setMessages((prev) => [...prev, { sender: "user", text: cleanMessage }]);
     setMessage("");
     setTyping(true);
     setShowSamples(false);
     setConversationFinished(false);
 
-    window.setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        { sender: "bot", text: result.answer, intent: result.intent, recordId, question: cleanMessage, suggestions: result.suggestions },
-      ]);
-      onConversation({ id: recordId, question: cleanMessage, answer: result.answer, intent: result.intent, createdAt: new Date().toISOString() });
-      setTyping(false);
-    }, 650);
+    let reply = prepared.answer;
+    let intent = prepared.intent;
+    if (geminiKeyRef.current) {
+      try {
+        reply = await answerWithGemini(
+          geminiKeyRef.current, cleanMessage, messages, faqs, products
+        );
+        intent = "gemini";
+      } catch {
+        reply = "Sorry, I couldn't complete that request just now. " + prepared.answer;
+      }
+    } else {
+      await new Promise((resolve) => window.setTimeout(resolve, 650));
+    }
+
+    setMessages((prev) => [...prev, {
+      sender: "bot",
+      text: reply,
+      intent,
+      recordId,
+      question: cleanMessage,
+      suggestions: prepared.suggestions,
+    }]);
+    onConversation({
+      id: recordId,
+      question: cleanMessage,
+      answer: reply,
+      intent,
+      createdAt: new Date().toISOString(),
+    });
+    setTyping(false);
   };
 
   useEffect(() => {
@@ -791,7 +838,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
               <div>
                 <h3 className="font-bold">Shemar Concierge</h3>
                 <p className="text-xs text-[#D4AF37]">
-                  Customer assistance · Demo
+                  Customer assistance
                 </p>
               </div>
             </div>
@@ -832,11 +879,7 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
                 >
                   <p>{item.text}</p>
 
-                  {item.intent && item.sender === "bot" && (
-                    <p className="mt-2 text-[10px] uppercase tracking-wider text-[#D4AF37]">
-                      Intent: {item.intent}
-                    </p>
-                  )}
+
 
                 </div>
               </div>
