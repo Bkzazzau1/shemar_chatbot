@@ -1,5 +1,5 @@
 // Temporary, presentation-only bridge to Google's pre-trained Gemini model.
-// The API key is never embedded, persisted, or placed in a URL.
+// The API key is not stored in Git source, but is exposed in the public deployed bundle.
 export async function answerWithGemini(key, question, history, faqs, products) {
   const approved = faqs.map(({ intent, answer }) => `${intent}: ${answer}`).join("\n");
   const catalogue = products.map(({ name, price, category }) =>
@@ -30,14 +30,14 @@ export async function answerWithGemini(key, question, history, faqs, products) {
   const timeoutId = window.setTimeout(() => controller.abort(), 22000);
   try {
     const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
       {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-goog-api-key": key },
         body: JSON.stringify({
           systemInstruction: { parts: [{ text: instructions }] },
           contents: context,
-          generationConfig: { temperature: 0.35, maxOutputTokens: 400 },
+          generationConfig: { temperature: 0.35, maxOutputTokens: 640 },
         }),
         signal: controller.signal,
       }
