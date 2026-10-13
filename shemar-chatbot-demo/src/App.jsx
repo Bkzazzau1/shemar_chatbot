@@ -700,22 +700,9 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
   const [rated, setRated] = useState([]);
   const [escalated, setEscalated] = useState([]);
   const [conversationFinished, setConversationFinished] = useState(false);
-  const geminiKeyRef = useRef("");
-
-  useEffect(() => {
-    const connect = (event) => {
-      if (event.ctrlKey && event.altKey && event.code === "KeyG" && !event.repeat) {
-        event.preventDefault();
-        const key = window.prompt("Gemini API key (leave blank to disconnect):");
-        if (key !== null) geminiKeyRef.current = key.trim();
-      }
-    };
-    window.addEventListener("keydown", connect);
-    return () => {
-      window.removeEventListener("keydown", connect);
-      geminiKeyRef.current = "";
-    };
-  }, []);
+  // During the defence, the site build is supplied with a temporary key.
+  // Vite includes VITE_* values in the public JS bundle; use a disposable key.
+  const geminiKey = import.meta.env.VITE_SHEMAR_GEMINI_API_KEY?.trim() || "";
 
   const lastMessage = messages[messages.length - 1];
   const latestReply = !typing && lastMessage?.sender === "bot" && lastMessage.recordId ? lastMessage : null;
@@ -786,10 +773,10 @@ function ChatbotWidget({ open, setOpen, faqs, onConversation, onFeedback, onEsca
 
     let reply = prepared.answer;
     let intent = prepared.intent;
-    if (geminiKeyRef.current) {
+    if (geminiKey) {
       try {
         reply = await answerWithGemini(
-          geminiKeyRef.current, cleanMessage, messages, faqs, products
+          geminiKey, cleanMessage, messages, faqs, products
         );
         intent = "gemini";
       } catch {
